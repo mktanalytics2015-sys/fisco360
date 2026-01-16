@@ -1,7 +1,8 @@
-import { CheckCircle, AlertTriangle, FileText, Calendar, Clock, BadgePercent, Building, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, AlertTriangle, FileText, Calendar, Clock, BadgePercent, Building, ChevronDown, ChevronUp, Printer } from 'lucide-react';
 import { useState } from 'react';
 import { TaxInfo, FiscalObligation, FiscalRegime } from '@/data/angolaTaxData';
-
+import { openPrintableReport } from '@/utils/pdfGenerator';
+import { Button } from '@/components/ui/button';
 interface SimulationResultsProps {
   regime: FiscalRegime;
   applicableTaxes: TaxInfo[];
@@ -263,6 +264,23 @@ const SimulationResults = ({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Botão Gerar PDF */}
+      <div className="flex justify-center pt-4">
+        <Button
+          onClick={() => openPrintableReport({
+            regime,
+            applicableTaxes,
+            obligations,
+            formattedRevenue,
+            employeeCount
+          })}
+          className="btn-gold gap-2 px-8 py-6 text-base font-semibold"
+        >
+          <Printer className="w-5 h-5" />
+          Gerar Relatório para Impressão (PDF)
+        </Button>
       </div>
     </div>
   );
