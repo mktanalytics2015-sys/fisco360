@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Users, DollarSign, MapPin, Briefcase, Calendar, Package, Plane } from 'lucide-react';
+import { Building2, Users, DollarSign, MapPin, Briefcase, Calendar, Package, Plane, Wallet, Building, Truck } from 'lucide-react';
 import { companyTypes, activityTypes, provinces } from '@/data/angolaTaxData';
 
 interface FormData {
@@ -12,6 +12,9 @@ interface FormData {
   hasAssets: boolean;
   hasImportExport: boolean;
   hasVehicles: boolean;
+  averageSalary: string;
+  assetValue: string;
+  importValue: string;
 }
 
 interface SimulatorFormProps {
@@ -29,7 +32,10 @@ const SimulatorForm = ({ onSimulate, isLoading }: SimulatorFormProps) => {
     establishmentYear: '',
     hasAssets: false,
     hasImportExport: false,
-    hasVehicles: false
+    hasVehicles: false,
+    averageSalary: '',
+    assetValue: '',
+    importValue: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -104,6 +110,27 @@ const SimulatorForm = ({ onSimulate, isLoading }: SimulatorFormProps) => {
         />
       </div>
 
+      {/* Salário Médio (aparece se tem trabalhadores) */}
+      {parseInt(formData.employeeCount) > 0 && (
+        <div className="space-y-2 animate-fade-in">
+          <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Wallet className="w-4 h-4 text-primary" />
+            Salário Médio Mensal (Kz)
+          </label>
+          <input
+            type="number"
+            value={formData.averageSalary}
+            onChange={(e) => handleChange('averageSalary', e.target.value)}
+            className="input-styled"
+            placeholder="Ex: 150000"
+            min="0"
+          />
+          <p className="text-xs text-muted-foreground">
+            Usado para calcular IRT e INSS. Se não indicar, será usado 150.000 Kz
+          </p>
+        </div>
+      )}
+
       {/* Província */}
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -121,6 +148,11 @@ const SimulatorForm = ({ onSimulate, isLoading }: SimulatorFormProps) => {
             <option key={province} value={province}>{province}</option>
           ))}
         </select>
+        {formData.province === 'Cabinda' && (
+          <p className="text-xs text-success animate-fade-in">
+            ✓ Cabinda tem taxa especial de IVA de 1%
+          </p>
+        )}
       </div>
 
       {/* Tipo de Actividade */}
@@ -164,39 +196,76 @@ const SimulatorForm = ({ onSimulate, isLoading }: SimulatorFormProps) => {
 
       {/* Opções Adicionais */}
       <div className="space-y-4 pt-4 border-t border-border">
-        <p className="text-sm font-medium text-foreground">Informações Adicionais</p>
+        <p className="text-sm font-medium text-foreground">Informações Adicionais para Cálculo</p>
         
-        <label className="flex items-center gap-3 cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={formData.hasAssets}
-            onChange={(e) => handleChange('hasAssets', e.target.checked)}
-            className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-          />
-          <Package className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-sm text-foreground">Possui imóveis ou propriedades</span>
-        </label>
+        <div className="space-y-4">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={formData.hasAssets}
+              onChange={(e) => handleChange('hasAssets', e.target.checked)}
+              className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
+            />
+            <Building className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            <span className="text-sm text-foreground">Possui imóveis ou propriedades</span>
+          </label>
 
-        <label className="flex items-center gap-3 cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={formData.hasImportExport}
-            onChange={(e) => handleChange('hasImportExport', e.target.checked)}
-            className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-          />
-          <Plane className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-sm text-foreground">Realiza importação/exportação</span>
-        </label>
+          {/* Valor do Património (aparece se tem imóveis) */}
+          {formData.hasAssets && (
+            <div className="ml-8 space-y-2 animate-fade-in">
+              <label className="text-sm text-muted-foreground">
+                Valor Patrimonial dos Imóveis (Kz)
+              </label>
+              <input
+                type="number"
+                value={formData.assetValue}
+                onChange={(e) => handleChange('assetValue', e.target.value)}
+                className="input-styled"
+                placeholder="Ex: 50000000"
+                min="0"
+              />
+            </div>
+          )}
 
-        <label className="flex items-center gap-3 cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={formData.hasVehicles}
-            onChange={(e) => handleChange('hasVehicles', e.target.checked)}
-            className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-          />
-          <span className="text-sm text-foreground">Possui veículos empresariais</span>
-        </label>
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={formData.hasImportExport}
+              onChange={(e) => handleChange('hasImportExport', e.target.checked)}
+              className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
+            />
+            <Plane className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            <span className="text-sm text-foreground">Realiza importação/exportação</span>
+          </label>
+
+          {/* Valor das Importações (aparece se faz importação) */}
+          {formData.hasImportExport && (
+            <div className="ml-8 space-y-2 animate-fade-in">
+              <label className="text-sm text-muted-foreground">
+                Valor Anual Estimado de Importações (Kz)
+              </label>
+              <input
+                type="number"
+                value={formData.importValue}
+                onChange={(e) => handleChange('importValue', e.target.value)}
+                className="input-styled"
+                placeholder="Ex: 100000000"
+                min="0"
+              />
+            </div>
+          )}
+
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={formData.hasVehicles}
+              onChange={(e) => handleChange('hasVehicles', e.target.checked)}
+              className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
+            />
+            <Truck className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            <span className="text-sm text-foreground">Possui veículos empresariais</span>
+          </label>
+        </div>
       </div>
 
       {/* Submit Button */}
