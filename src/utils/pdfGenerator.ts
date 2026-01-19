@@ -1,8 +1,10 @@
 import { TaxInfo, FiscalObligation, FiscalRegime } from '@/data/angolaTaxData';
+import { TaxCalculation } from '@/utils/fiscalCalculator';
 
 interface PDFData {
   regime: FiscalRegime;
   applicableTaxes: TaxInfo[];
+  taxCalculations?: TaxCalculation[];
   obligations: {
     monthly: FiscalObligation[];
     quarterly: FiscalObligation[];
@@ -10,6 +12,7 @@ interface PDFData {
   };
   formattedRevenue: string;
   employeeCount: number;
+  totalAnnualTaxEstimate?: number;
   companyType?: string;
   activityType?: string;
   province?: string;
@@ -152,6 +155,38 @@ export const generateFiscalReportHTML = (data: PDFData): string => {
             </div>
           `).join('')}
         </div>
+
+        ${data.taxCalculations && data.taxCalculations.length > 0 && data.totalAnnualTaxEstimate ? `
+          <h2 class="section-title">Estimativa de Impostos</h2>
+          <div style="background: linear-gradient(135deg, #c9a227 0%, #e6c84d 100%); color: #1e3a5f; padding: 16px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
+            <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8;">Total Anual Estimado</div>
+            <div style="font-size: 24px; font-weight: bold;">${data.totalAnnualTaxEstimate.toLocaleString('pt-AO')} Kz</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Imposto</th>
+                <th>Base de Cálculo</th>
+                <th>Taxa</th>
+                <th>Valor Estimado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.taxCalculations.map(calc => `
+                <tr>
+                  <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                    <strong>${calc.abbreviation}</strong><br>
+                    <span style="color: #6b7280; font-size: 11px;">${calc.notes}</span>
+                  </td>
+                  <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right;">${calc.baseValue > 0 ? calc.baseValue.toLocaleString('pt-AO') + ' Kz' : '-'}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right;">${calc.rate > 0 ? (calc.rate * 100).toFixed(1) + '%' : '-'}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #1e3a5f;">${calc.estimatedAmount.toLocaleString('pt-AO')} Kz</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <p style="font-size: 11px; color: #6b7280; font-style: italic; margin-top: 8px;">* Valores estimados para efeitos de planeamento.</p>
+        ` : ''}
 
         <h2 class="section-title">Impostos Aplicáveis (${data.applicableTaxes.length})</h2>
         <table>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw } from 'lucide-react';
 import SimulatorForm from '@/components/SimulatorForm';
 import SimulationResults from '@/components/SimulationResults';
+import FeedbackWidget from '@/components/FeedbackWidget';
 import { calculateFiscalFramework, SimulationResult } from '@/utils/fiscalCalculator';
 
 const Index = () => {
@@ -165,9 +166,11 @@ const Index = () => {
               <SimulationResults 
                 regime={results.regime}
                 applicableTaxes={results.applicableTaxes}
+                taxCalculations={results.taxCalculations}
                 obligations={results.obligations}
                 formattedRevenue={results.formattedRevenue}
                 employeeCount={results.employeeCount}
+                totalAnnualTaxEstimate={results.totalAnnualTaxEstimate}
               />
             </div>
           )}
@@ -190,6 +193,9 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Feedback Widget */}
+      <FeedbackWidget />
     </div>
   );
 };
