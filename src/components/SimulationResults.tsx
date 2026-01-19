@@ -1,11 +1,14 @@
-import { CheckCircle, AlertTriangle, FileText, Calendar, Clock, BadgePercent, Building, ChevronDown, ChevronUp, Printer } from 'lucide-react';
+import { CheckCircle, AlertTriangle, FileText, Calendar, Clock, BadgePercent, Building, ChevronDown, ChevronUp, Printer, Calculator, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { TaxInfo, FiscalObligation, FiscalRegime } from '@/data/angolaTaxData';
+import { TaxCalculation } from '@/utils/fiscalCalculator';
 import { openPrintableReport } from '@/utils/pdfGenerator';
 import { Button } from '@/components/ui/button';
+
 interface SimulationResultsProps {
   regime: FiscalRegime;
   applicableTaxes: TaxInfo[];
+  taxCalculations: TaxCalculation[];
   obligations: {
     monthly: FiscalObligation[];
     quarterly: FiscalObligation[];
@@ -13,16 +16,20 @@ interface SimulationResultsProps {
   };
   formattedRevenue: string;
   employeeCount: number;
+  totalAnnualTaxEstimate: number;
 }
 
 const SimulationResults = ({ 
   regime, 
-  applicableTaxes, 
+  applicableTaxes,
+  taxCalculations,
   obligations,
   formattedRevenue,
-  employeeCount
+  employeeCount,
+  totalAnnualTaxEstimate
 }: SimulationResultsProps) => {
   const [expandedSections, setExpandedSections] = useState({
+    calculations: true,
     taxes: true,
     monthly: true,
     quarterly: true,
@@ -53,6 +60,10 @@ const SimulationResults = ({
       case 'especial': return 'Especial';
       default: return category;
     }
+  };
+
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('pt-AO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' Kz';
   };
 
   return (
@@ -94,6 +105,80 @@ const SimulationResults = ({
           </div>
         </div>
       </div>
+
+      {/* Cálculo Estimado de Impostos */}
+      {taxCalculations.length > 0 && (
+        <div className="card-elevated overflow-hidden border-2 border-accent/30">
+          <button
+            onClick={() => toggleSection('calculations')}
+            className="w-full p-4 flex items-center justify-between bg-accent/10 hover:bg-accent/20 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Calculator className="w-5 h-5 text-accent" />
+              <span className="font-semibold text-foreground">
+                Cálculo Estimado de Impostos
+              </span>
+            </div>
+            {expandedSections.calculations ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          
+          {expandedSections.calculations && (
+            <div className="p-4">
+              {/* Total Estimado */}
+              <div className="mb-4 p-4 rounded-lg bg-gradient-to-r from-accent/20 to-accent/5 border border-accent/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-accent" />
+                    <span className="font-medium text-foreground">Total Anual Estimado</span>
+                  </div>
+                  <span className="text-2xl font-bold text-accent">
+                    {formatCurrency(totalAnnualTaxEstimate)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tabela de Cálculos */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-2 px-2 font-medium text-muted-foreground">Imposto</th>
+                      <th className="text-right py-2 px-2 font-medium text-muted-foreground">Base</th>
+                      <th className="text-right py-2 px-2 font-medium text-muted-foreground">Taxa</th>
+                      <th className="text-right py-2 px-2 font-medium text-muted-foreground">Valor Est.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {taxCalculations.map((calc) => (
+                      <tr key={calc.taxId} className="border-b border-border/50 hover:bg-muted/50">
+                        <td className="py-3 px-2">
+                          <div>
+                            <span className="font-medium text-foreground">{calc.abbreviation}</span>
+                            <p className="text-xs text-muted-foreground">{calc.notes}</p>
+                          </div>
+                        </td>
+                        <td className="text-right py-3 px-2 text-muted-foreground">
+                          {calc.baseValue > 0 ? formatCurrency(calc.baseValue) : '-'}
+                        </td>
+                        <td className="text-right py-3 px-2 text-muted-foreground">
+                          {calc.rate > 0 ? `${(calc.rate * 100).toFixed(1)}%` : '-'}
+                        </td>
+                        <td className="text-right py-3 px-2 font-semibold text-primary">
+                          {formatCurrency(calc.estimatedAmount)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <p className="mt-3 text-xs text-muted-foreground italic">
+                * Valores estimados para efeitos de planeamento. Consulte um contabilista para cálculos exactos.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Impostos Aplicáveis */}
       <div className="card-elevated overflow-hidden">
@@ -258,7 +343,7 @@ const SimulationResults = ({
           <div>
             <p className="text-sm font-medium text-foreground">Aviso Importante</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Este simulador fornece informações gerais baseadas no Código Geral Tributário de Angola. 
+              Este simulador fornece informações gerais baseadas no Código Geral Tributário de Angola e calendário fiscal da AGT (2024/2025). 
               Para uma análise detalhada da sua situação fiscal específica, recomendamos consultar 
               um contabilista certificado ou a Administração Geral Tributária (AGT).
             </p>
@@ -272,9 +357,11 @@ const SimulationResults = ({
           onClick={() => openPrintableReport({
             regime,
             applicableTaxes,
+            taxCalculations,
             obligations,
             formattedRevenue,
-            employeeCount
+            employeeCount,
+            totalAnnualTaxEstimate
           })}
           className="btn-gold gap-2 px-8 py-6 text-base font-semibold"
         >
