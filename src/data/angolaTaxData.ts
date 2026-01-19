@@ -269,9 +269,9 @@ export const taxes: TaxInfo[] = [
   },
   {
     id: 'taxa_circulacao',
-    name: 'Taxa de Circulação de Veículos',
-    abbreviation: 'TCV',
-    description: 'Taxa anual sobre veículos automóveis matriculados em Angola',
+    name: 'Imposto sobre Veículos Motorizados',
+    abbreviation: 'IVM',
+    description: 'Imposto anual sobre veículos automóveis matriculados em Angola',
     rate: 'Variável: 5.000 Kz (motociclos) a 200.000 Kz (veículos de luxo)',
     rateValue: 0,
     frequency: 'anual',
