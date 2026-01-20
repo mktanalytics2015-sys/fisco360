@@ -165,6 +165,8 @@ const Index = () => {
               {/* Results Content */}
               <SimulationResults 
                 regime={results.regime}
+                industrialTaxRegime={results.industrialTaxRegime}
+                ivaRegime={results.ivaRegime}
                 applicableTaxes={results.applicableTaxes}
                 taxCalculations={results.taxCalculations}
                 obligations={results.obligations}

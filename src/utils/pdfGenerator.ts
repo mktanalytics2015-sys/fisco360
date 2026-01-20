@@ -1,8 +1,10 @@
-import { TaxInfo, FiscalObligation, FiscalRegime } from '@/data/angolaTaxData';
+import { TaxInfo, FiscalObligation, FiscalRegime, IndustrialTaxRegime, IvaRegime } from '@/data/angolaTaxData';
 import { TaxCalculation } from '@/utils/fiscalCalculator';
 
 interface PDFData {
   regime: FiscalRegime;
+  industrialTaxRegime: IndustrialTaxRegime;
+  ivaRegime: IvaRegime;
   applicableTaxes: TaxInfo[];
   taxCalculations?: TaxCalculation[];
   obligations: {
@@ -13,9 +15,6 @@ interface PDFData {
   formattedRevenue: string;
   employeeCount: number;
   totalAnnualTaxEstimate?: number;
-  companyType?: string;
-  activityType?: string;
-  province?: string;
 }
 
 const getCategoryLabel = (category: TaxInfo['category']) => {
