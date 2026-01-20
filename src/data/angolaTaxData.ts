@@ -454,13 +454,14 @@ export interface FiscalObligation {
   applicableTo: string[];
 }
 
-// Prazos oficiais conforme Calendário Fiscal da AGT
+// Prazos oficiais conforme Calendário Fiscal da AGT 2026
+// Fontes: Lei n.º 14/25 (OGE 2026), Circular n.º 1/GACA/GJ/AGT/2026, Lei n.º 19/14 (CII)
 export const fiscalObligations: FiscalObligation[] = [
   // ========== OBRIGAÇÕES MENSAIS ==========
   {
     id: 'declaracao_iva',
     name: 'Declaração Periódica de IVA',
-    description: 'Entrega da declaração mensal de IVA e pagamento do imposto',
+    description: 'Entrega da declaração mensal de IVA e pagamento do imposto (Regime Geral)',
     deadline: 'Até ao último dia útil do mês seguinte ao período de tributação',
     frequency: 'mensal',
     applicableTo: ['general', 'large_taxpayers']
@@ -468,8 +469,8 @@ export const fiscalObligations: FiscalObligation[] = [
   {
     id: 'retencao_irt',
     name: 'Retenção e Entrega do IRT',
-    description: 'Retenção na fonte do IRT sobre salários e entrega à AGT',
-    deadline: 'Até ao dia 15 do mês seguinte ao pagamento',
+    description: 'Retenção na fonte do IRT sobre salários e remunerações e entrega à AGT',
+    deadline: 'Até ao último dia do mês seguinte ao do pagamento ou colocação à disposição',
     frequency: 'mensal',
     applicableTo: ['all']
   },
@@ -477,7 +478,7 @@ export const fiscalObligations: FiscalObligation[] = [
     id: 'contribuicao_inss',
     name: 'Pagamento das Contribuições ao INSS',
     description: 'Entrega das contribuições patronais (8%) e dos trabalhadores (3%) ao INSS',
-    deadline: 'Até ao dia 15 do mês seguinte ao pagamento de salários',
+    deadline: 'Até ao último dia do mês seguinte ao pagamento de salários',
     frequency: 'mensal',
     applicableTo: ['all']
   },
@@ -485,7 +486,7 @@ export const fiscalObligations: FiscalObligation[] = [
     id: 'retencao_fonte_servicos',
     name: 'Retenção na Fonte sobre Serviços',
     description: 'Entrega da retenção de 6,5% sobre serviços prestados por terceiros',
-    deadline: 'Até ao dia 15 do mês seguinte ao pagamento',
+    deadline: 'Até ao último dia do mês seguinte ao do pagamento',
     frequency: 'mensal',
     applicableTo: ['general', 'large_taxpayers']
   },
