@@ -1,6 +1,6 @@
 // Dados fiscais de Angola baseados no Código Geral Tributário (CGT)
-// Atualizado conforme legislação vigente 2024/2025
-// Fontes: AGT - Administração Geral Tributária, PwC Tax Summaries
+// Atualizado conforme legislação vigente 2025/2026
+// Fontes: AGT - Administração Geral Tributária, Decreto Presidencial 71/25
 
 export interface TaxInfo {
   id: string;
@@ -13,6 +13,7 @@ export interface TaxInfo {
   applicableTo: string[];
   category: 'rendimento' | 'consumo' | 'patrimonio' | 'social' | 'especial';
   baseCalculo?: string; // Base de cálculo para o imposto
+  formula?: string; // Fórmula de cálculo
 }
 
 export interface FiscalRegime {
@@ -23,31 +24,146 @@ export interface FiscalRegime {
   characteristics: string[];
 }
 
+// Regimes de tributação para Imposto Industrial
+export interface IndustrialTaxRegime {
+  id: string;
+  name: string;
+  grupo: string;
+  volumeNegociosMin: number;
+  volumeNegociosMax: number;
+  taxa: number;
+  formula: string;
+  descricao: string;
+}
+
+export const industrialTaxRegimes: IndustrialTaxRegime[] = [
+  {
+    id: 'ii_geral_grupo_a',
+    name: 'Regime Geral - Grupo A',
+    grupo: 'A',
+    volumeNegociosMin: 2000000001,
+    volumeNegociosMax: Infinity,
+    taxa: 0.25,
+    formula: 'II = Matéria Colectável × 25%',
+    descricao: 'Grandes contribuintes com volume de negócios superior a 2 mil milhões Kz. Contabilidade organizada obrigatória.'
+  },
+  {
+    id: 'ii_geral_grupo_b',
+    name: 'Regime Geral - Grupo B',
+    grupo: 'B',
+    volumeNegociosMin: 350000001,
+    volumeNegociosMax: 2000000000,
+    taxa: 0.25,
+    formula: 'II = Matéria Colectável × 25%',
+    descricao: 'Contribuintes com volume de negócios entre 350 milhões e 2 mil milhões Kz. Contabilidade organizada obrigatória.'
+  },
+  {
+    id: 'ii_simplificado_grupo_c',
+    name: 'Regime Simplificado - Grupo C',
+    grupo: 'C',
+    volumeNegociosMin: 0,
+    volumeNegociosMax: 350000000,
+    taxa: 0.065,
+    formula: 'II = Volume de Negócios × 6,5%',
+    descricao: 'Pequenos contribuintes com volume de negócios até 350 milhões Kz. Tributação sobre volume de negócios.'
+  }
+];
+
+// Regimes de tributação para IVA
+export interface IvaRegime {
+  id: string;
+  name: string;
+  volumeNegociosMin: number;
+  volumeNegociosMax: number;
+  taxa: number;
+  formula: string;
+  descricao: string;
+  obrigacoes: string[];
+}
+
+export const ivaRegimes: IvaRegime[] = [
+  {
+    id: 'iva_geral',
+    name: 'Regime Geral do IVA',
+    volumeNegociosMin: 350000001,
+    volumeNegociosMax: Infinity,
+    taxa: 0.14,
+    formula: 'IVA = (Vendas × 14%) - (Compras × 14%)',
+    descricao: 'Volume de negócios acima de 350 milhões Kz. Método de dedução (crédito de imposto).',
+    obrigacoes: [
+      'Declaração mensal de IVA',
+      'Software de facturação certificado obrigatório',
+      'Contabilidade organizada'
+    ]
+  },
+  {
+    id: 'iva_simplificado',
+    name: 'Regime Simplificado do IVA',
+    volumeNegociosMin: 25000001,
+    volumeNegociosMax: 350000000,
+    taxa: 0.07,
+    formula: 'IVA = Volume de Negócios × 7%',
+    descricao: 'Volume de negócios entre 25 e 350 milhões Kz. Taxa reduzida de 7% sobre recebimentos.',
+    obrigacoes: [
+      'Declaração trimestral de IVA',
+      'Software de facturação certificado obrigatório',
+      'Pagamento até último dia útil do mês seguinte ao trimestre'
+    ]
+  },
+  {
+    id: 'iva_exclusao',
+    name: 'Regime de Exclusão do IVA',
+    volumeNegociosMin: 0,
+    volumeNegociosMax: 25000000,
+    taxa: 0,
+    formula: 'IVA = 0 (Isento)',
+    descricao: 'Volume de negócios até 25 milhões Kz. Não há obrigação de liquidar IVA.',
+    obrigacoes: [
+      'Pode emitir facturas em blocos impressos ou Portal do Contribuinte',
+      'Máximo de 300 facturas/ano via Portal',
+      'Sem obrigação de declaração de IVA'
+    ]
+  }
+];
+
 export const fiscalRegimes: FiscalRegime[] = [
+  {
+    id: 'exclusao',
+    name: 'Regime de Exclusão',
+    description: 'Para contribuintes com volume de negócios até 25 milhões Kz',
+    revenueRange: { min: 0, max: 25000000 },
+    characteristics: [
+      'Isento de IVA',
+      'Pode emitir facturas via Portal do Contribuinte',
+      'Imposto Industrial: 6,5% sobre volume de negócios (Grupo C)',
+      'Sem obrigação de contabilidade organizada',
+      'Máximo 300 facturas/ano via Portal'
+    ]
+  },
   {
     id: 'simplified',
     name: 'Regime Simplificado',
     description: 'Para contribuintes com volume de negócios entre 25 milhões e 350 milhões Kz',
-    revenueRange: { min: 0, max: 350000000 },
+    revenueRange: { min: 25000001, max: 350000000 },
     characteristics: [
-      'Contabilidade simplificada',
       'IVA à taxa de 7% sobre recebimentos',
-      'Imposto Industrial de 6,5% para Grupo C (até 10 milhões Kz)',
-      'Pagamento trimestral',
-      'Menos obrigações declarativas'
+      'Imposto Industrial de 6,5% sobre volume de negócios (Grupo C)',
+      'Declaração trimestral de IVA',
+      'Software de facturação certificado obrigatório',
+      'Contabilidade simplificada'
     ]
   },
   {
     id: 'general',
     name: 'Regime Geral',
-    description: 'Regime aplicável a empresas com volume de negócios superior a 350 milhões Kz',
+    description: 'Regime aplicável a empresas com volume de negócios entre 350 milhões e 2 mil milhões Kz',
     revenueRange: { min: 350000001, max: 2000000000 },
     characteristics: [
-      'Contabilidade organizada obrigatória',
+      'IVA à taxa normal de 14% (método de dedução)',
+      'Imposto Industrial: 25% sobre matéria colectável (Grupo B)',
       'Declarações mensais de IVA',
-      'IVA à taxa normal de 14%',
-      'Pagamento por conta trimestral do II',
-      'Possibilidade de auditoria fiscal'
+      'Contabilidade organizada obrigatória',
+      'Pagamento por conta trimestral do II'
     ]
   },
   {
@@ -56,11 +172,11 @@ export const fiscalRegimes: FiscalRegime[] = [
     description: 'Para empresas com volume de negócios acima de 2 mil milhões Kz',
     revenueRange: { min: 2000000001, max: Infinity },
     characteristics: [
+      'IVA à taxa normal de 14% (método de dedução)',
+      'Imposto Industrial: 25% sobre matéria colectável (Grupo A)',
       'Acompanhamento fiscal permanente pela AGT',
-      'Obrigações declarativas reforçadas',
       'Representante fiscal obrigatório',
-      'Auditoria fiscal regular',
-      'Pagamentos electrónicos obrigatórios'
+      'Auditoria fiscal regular'
     ]
   }
 ];
@@ -525,16 +641,20 @@ export const activityTypes = [
   { id: 'entretenimento', name: 'Entretenimento', description: 'Media, eventos e lazer' }
 ];
 
-// Tabela de IRT para cálculo
+// Tabela de IRT para cálculo - Atualizada 2025/2026
+// Isenção até 150.000 Kz conforme legislação vigente
 export const irtBrackets = [
-  { min: 0, max: 100000, rate: 0, deduction: 0 },
-  { min: 100001, max: 150000, rate: 0.13, deduction: 13000 },
-  { min: 150001, max: 200000, rate: 0.16, deduction: 17500 },
-  { min: 200001, max: 300000, rate: 0.18, deduction: 21500 },
-  { min: 300001, max: 500000, rate: 0.19, deduction: 24500 },
-  { min: 500001, max: 1000000, rate: 0.20, deduction: 29500 },
-  { min: 1000001, max: 1500000, rate: 0.21, deduction: 39500 },
-  { min: 1500001, max: 2000000, rate: 0.22, deduction: 54500 },
-  { min: 2000001, max: 2500000, rate: 0.23, deduction: 74500 },
-  { min: 2500001, max: Infinity, rate: 0.25, deduction: 124500 }
+  { min: 0, max: 150000, rate: 0, deduction: 0, descricao: 'Isento' },
+  { min: 150001, max: 200000, rate: 0.13, deduction: 19500, descricao: '13%' },
+  { min: 200001, max: 300000, rate: 0.16, deduction: 25500, descricao: '16%' },
+  { min: 300001, max: 500000, rate: 0.18, deduction: 31500, descricao: '18%' },
+  { min: 500001, max: 1000000, rate: 0.19, deduction: 36500, descricao: '19%' },
+  { min: 1000001, max: 1500000, rate: 0.20, deduction: 46500, descricao: '20%' },
+  { min: 1500001, max: 2000000, rate: 0.21, deduction: 61500, descricao: '21%' },
+  { min: 2000001, max: 2500000, rate: 0.22, deduction: 81500, descricao: '22%' },
+  { min: 2500001, max: 5000000, rate: 0.23, deduction: 106500, descricao: '23%' },
+  { min: 5000001, max: Infinity, rate: 0.25, deduction: 206500, descricao: '25%' }
 ];
+
+// Fórmula de cálculo do IRT
+export const irtFormula = 'IRT = (Salário Bruto × Taxa) - Dedução';
