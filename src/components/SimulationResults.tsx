@@ -466,8 +466,9 @@ const SimulationResults = ({
             <div>
               <p className="text-sm font-medium text-foreground">Aviso Importante</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Este simulador fornece informações gerais baseadas no Código Geral Tributário de Angola, 
-                Decreto Presidencial 71/25 e calendário fiscal da AGT (2025/2026). 
+                Este simulador fornece informações gerais baseadas na legislação fiscal angolana vigente, incluindo: 
+                Lei n.º 14/25 (OGE 2026), Circular n.º 1/GACA/GJ/AGT/2026, Lei n.º 19/14 (Código do Imposto Industrial), 
+                Lei n.º 18/14 (Código do IRT) e Lei n.º 26/20. 
                 Para uma análise detalhada da sua situação fiscal específica, recomendamos consultar 
                 um contabilista certificado ou a Administração Geral Tributária (AGT).
               </p>
