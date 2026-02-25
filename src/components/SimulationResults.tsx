@@ -216,28 +216,43 @@ const SimulationResults = ({
           </button>
           
           {expandedSections.taxes && (
-            <div className="p-4 space-y-3">
+            <div className="p-4 space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50 border border-border">
+                <p className="text-sm text-muted-foreground">
+                  Com base no enquadramento da sua empresa, estes são os impostos a que está sujeito. Cada imposto tem regras próprias de cálculo, taxas e prazos de pagamento que deve cumprir junto da AGT e do INSS.
+                </p>
+              </div>
+
               {applicableTaxes.map((tax) => (
                 <div key={tax.id} className="p-4 rounded-lg border border-border hover:border-primary/30 transition-colors">
                   <div className="flex items-start justify-between mb-2">
-                    <div>
+                    <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-foreground">{tax.name}</h4>
                         <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
                           {tax.abbreviation}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">{tax.description}</p>
+                      <p className="text-sm text-muted-foreground mb-2">{tax.description}</p>
+                      
+                      {/* O que deve pagar */}
+                      <div className="mt-2 space-y-1">
+                        <p className="text-xs font-semibold text-foreground uppercase tracking-wide">O que deve pagar:</p>
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Base de cálculo:</span> {tax.baseCalculo}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Taxa aplicável:</span> {tax.rate}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Periodicidade:</span>{' '}
+                          <span className="capitalize">{tax.frequency === 'pontual' ? 'Sempre que aplicável' : tax.frequency}</span>
+                        </p>
+                      </div>
                     </div>
-                    <span className={`text-xs font-medium px-2 py-1 rounded ${getCategoryColor(tax.category)}`}>
+                    <span className={`text-xs font-medium px-2 py-1 rounded whitespace-nowrap ml-3 ${getCategoryColor(tax.category)}`}>
                       {getCategoryLabel(tax.category)}
                     </span>
-                  </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                    <span className="text-sm font-medium text-foreground">
-                      Taxa: <span className="text-primary">{tax.rate}</span>
-                    </span>
-                    <span className="badge-primary text-xs capitalize">{tax.frequency}</span>
                   </div>
                 </div>
               ))}
