@@ -25,6 +25,8 @@ interface FormData {
   averageSalary?: string;
   assetValue?: string;
   importValue?: string;
+  annualCosts?: string;
+  contractsValue?: string;
 }
 
 export interface TaxCalculation {
@@ -97,6 +99,8 @@ export function calculateFiscalFramework(formData: FormData): SimulationResult {
   const averageSalary = parseInt(formData.averageSalary || '150000') || 150000;
   const assetValue = parseInt(formData.assetValue || '0') || 0;
   const importValue = parseInt(formData.importValue || '0') || 0;
+  const annualCosts = parseInt(formData.annualCosts || '0') || 0;
+  const contractsValue = parseInt(formData.contractsValue || '0') || 0;
   
   // Determinar o regime fiscal geral
   let regime = fiscalRegimes.find(r => 
@@ -136,23 +140,34 @@ export function calculateFiscalFramework(formData: FormData): SimulationResult {
     iiNotes = `Grupo C (Simplificado): 6,5% sobre volume de negócios`;
   } else {
     // Regime Geral: taxa sobre matéria colectável (lucro tributável)
-    // Estimativa: 10-15% do volume de negócios como lucro
-    const estimatedProfit = revenue * 0.12;
+    // Se o utilizador forneceu custos, usar para calcular lucro tributável
+    let estimatedProfit: number;
+    let profitExplanation: string;
+    
+    if (annualCosts > 0) {
+      estimatedProfit = Math.max(0, revenue - annualCosts);
+      profitExplanation = `Proveitos (${revenue.toLocaleString('pt-AO')}) - Custos (${annualCosts.toLocaleString('pt-AO')})`;
+    } else {
+      // Estimativa conservadora: 15% de margem de lucro quando não há dados de custos
+      estimatedProfit = revenue * 0.15;
+      profitExplanation = `${revenue.toLocaleString('pt-AO')} × 15% (margem estimada, sem custos indicados)`;
+    }
+    
     iiBaseValue = estimatedProfit;
     
-    // Ajustar taxa por sector
+    // Ajustar taxa por sector conforme Lei 19/14 (CII)
     if (formData.activityType === 'agricultura') {
       iiRate = 0.15;
-      iiNotes = `Grupo ${industrialTaxRegime.grupo} (Geral): 15% para agricultura`;
+      iiNotes = `Grupo ${industrialTaxRegime.grupo}: 15% sobre lucro tributável (agricultura)`;
     } else if (['financeiro', 'tecnologia'].includes(formData.activityType)) {
       iiRate = 0.35;
-      iiNotes = `Grupo ${industrialTaxRegime.grupo} (Geral): 35% para sector financeiro/telecom`;
+      iiNotes = `Grupo ${industrialTaxRegime.grupo}: 35% sobre lucro tributável (sector financeiro/telecom)`;
     } else {
-      iiNotes = `Grupo ${industrialTaxRegime.grupo} (Geral): 25% sobre lucro tributável`;
+      iiNotes = `Grupo ${industrialTaxRegime.grupo}: 25% sobre lucro tributável`;
     }
     
     iiAmount = estimatedProfit * iiRate;
-    iiFormula = `II = Lucro Tributável × ${(iiRate * 100).toFixed(0)}% = ${estimatedProfit.toLocaleString('pt-AO')} × ${(iiRate * 100).toFixed(0)}% = ${iiAmount.toLocaleString('pt-AO')} Kz`;
+    iiFormula = `II = Lucro Tributável × ${(iiRate * 100).toFixed(0)}% = [${profitExplanation}] × ${(iiRate * 100).toFixed(0)}% = ${iiAmount.toLocaleString('pt-AO')} Kz`;
   }
   
   taxCalculations.push({
@@ -213,17 +228,26 @@ export function calculateFiscalFramework(formData: FormData): SimulationResult {
   });
 
   // ========== IMPOSTO DE SELO ==========
-  const seloAmount = revenue * 0.003;
+  // O IS incide sobre recibos de quitação (1%), contratos e operações documentadas
+  // Conforme Tabela Geral do Imposto de Selo
+  const seloBase = contractsValue > 0 ? contractsValue : revenue;
+  const seloRate = 0.01; // 1% sobre recibos de quitação (taxa mais comum)
+  const seloAmount = seloBase * seloRate;
+  const seloExplanation = contractsValue > 0 
+    ? `IS = Valor de Recibos/Contratos × 1% = ${contractsValue.toLocaleString('pt-AO')} × 1% = ${seloAmount.toLocaleString('pt-AO')} Kz`
+    : `IS = Volume de Negócios × 1% = ${revenue.toLocaleString('pt-AO')} × 1% = ${seloAmount.toLocaleString('pt-AO')} Kz (estimativa — indique o valor de recibos/contratos para maior precisão)`;
   taxCalculations.push({
     taxId: 'imposto_selo',
     taxName: 'Imposto de Selo',
     abbreviation: 'IS',
-    baseValue: revenue,
-    rate: 0.003,
+    baseValue: seloBase,
+    rate: seloRate,
     estimatedAmount: seloAmount,
     frequency: 'pontual',
-    notes: '0,3% sobre operações documentadas',
-    formula: `IS = ${revenue.toLocaleString('pt-AO')} × 0,3% = ${seloAmount.toLocaleString('pt-AO')} Kz`
+    notes: contractsValue > 0 
+      ? '1% sobre recibos de quitação e contratos documentados'
+      : '1% sobre volume de negócios (estimativa — forneça valor de recibos para precisão)',
+    formula: seloExplanation
   });
 
   // ========== IRT E INSS (se tem trabalhadores) ==========
