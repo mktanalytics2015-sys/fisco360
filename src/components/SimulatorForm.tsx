@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Users, DollarSign, MapPin, Briefcase, Calendar, Package, Plane, Wallet, Building, Truck } from 'lucide-react';
+import { Building2, Users, DollarSign, MapPin, Briefcase, Calendar, Package, Plane, Wallet, Building, Truck, Receipt, TrendingDown } from 'lucide-react';
 import { companyTypes, activityTypes, provinces } from '@/data/angolaTaxData';
 
 interface FormData {
@@ -15,6 +15,8 @@ interface FormData {
   averageSalary: string;
   assetValue: string;
   importValue: string;
+  annualCosts: string;
+  contractsValue: string;
 }
 
 interface SimulatorFormProps {
@@ -35,7 +37,9 @@ const SimulatorForm = ({ onSimulate, isLoading }: SimulatorFormProps) => {
     hasVehicles: false,
     averageSalary: '',
     assetValue: '',
-    importValue: ''
+    importValue: '',
+    annualCosts: '',
+    contractsValue: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -90,6 +94,44 @@ const SimulatorForm = ({ onSimulate, isLoading }: SimulatorFormProps) => {
         />
         <p className="text-xs text-muted-foreground">
           Insira o valor em Kwanzas sem pontos ou vírgulas
+        </p>
+      </div>
+
+      {/* Custos Operacionais Anuais */}
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+          <TrendingDown className="w-4 h-4 text-primary" />
+          Custos/Despesas Operacionais Anuais (Kz)
+        </label>
+        <input
+          type="number"
+          value={formData.annualCosts}
+          onChange={(e) => handleChange('annualCosts', e.target.value)}
+          className="input-styled"
+          placeholder="Ex: 35000000"
+          min="0"
+        />
+        <p className="text-xs text-muted-foreground">
+          Custos dedutíveis (pessoal, fornecimentos, amortizações, etc.). Usado para calcular o lucro tributável no Imposto Industrial (Grupos A e B).
+        </p>
+      </div>
+
+      {/* Valor de Contratos / Recibos para IS */}
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+          <Receipt className="w-4 h-4 text-primary" />
+          Valor Anual de Recibos e Contratos (Kz)
+        </label>
+        <input
+          type="number"
+          value={formData.contractsValue}
+          onChange={(e) => handleChange('contractsValue', e.target.value)}
+          className="input-styled"
+          placeholder="Ex: 20000000"
+          min="0"
+        />
+        <p className="text-xs text-muted-foreground">
+          Valor total dos recibos de quitação emitidos e contratos celebrados. Usado para calcular o Imposto de Selo (taxa de 1% sobre recibos).
         </p>
       </div>
 

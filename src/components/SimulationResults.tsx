@@ -200,109 +200,6 @@ const SimulationResults = ({
           )}
         </div>
 
-        {/* Cálculo Estimado de Impostos */}
-        {taxCalculations.length > 0 && (
-          <div className="card-elevated overflow-hidden border-2 border-accent/30">
-            <button
-              onClick={() => toggleSection('calculations')}
-              className="w-full p-4 flex items-center justify-between bg-accent/10 hover:bg-accent/20 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Calculator className="w-5 h-5 text-accent" />
-                <span className="font-semibold text-foreground">
-                  Cálculo Estimado de Impostos
-                </span>
-              </div>
-              {expandedSections.calculations ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-            </button>
-            
-            {expandedSections.calculations && (
-              <div className="p-4">
-                {/* Total Estimado */}
-                <div className="mb-4 p-4 rounded-lg bg-gradient-to-r from-accent/20 to-accent/5 border border-accent/30">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-accent" />
-                      <span className="font-medium text-foreground">Total Anual Estimado</span>
-                    </div>
-                    <span className="text-2xl font-bold text-accent">
-                      {formatCurrency(totalAnnualTaxEstimate)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Tabela de Cálculos */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-2 px-2 font-medium text-muted-foreground">Imposto</th>
-                        <th className="text-right py-2 px-2 font-medium text-muted-foreground">Base</th>
-                        <th className="text-right py-2 px-2 font-medium text-muted-foreground">Taxa</th>
-                        <th className="text-right py-2 px-2 font-medium text-muted-foreground">Valor Est.</th>
-                        <th className="text-center py-2 px-2 font-medium text-muted-foreground w-10">
-                          <Info className="w-4 h-4 mx-auto" />
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {taxCalculations.map((calc) => (
-                        <tr key={calc.taxId} className="border-b border-border/50 hover:bg-muted/50">
-                          <td className="py-3 px-2">
-                            <div>
-                              <span className="font-medium text-foreground">{calc.abbreviation}</span>
-                              <p className="text-xs text-muted-foreground">{calc.notes}</p>
-                            </div>
-                          </td>
-                          <td className="text-right py-3 px-2 text-muted-foreground">
-                            {calc.baseValue > 0 ? formatCurrency(calc.baseValue) : '-'}
-                          </td>
-                          <td className="text-right py-3 px-2 text-muted-foreground">
-                            {calc.rate > 0 ? `${(calc.rate * 100).toFixed(1)}%` : '-'}
-                          </td>
-                          <td className="text-right py-3 px-2 font-semibold text-primary">
-                            {formatCurrency(calc.estimatedAmount)}
-                          </td>
-                          <td className="text-center py-3 px-2">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button className="p-1 rounded hover:bg-muted">
-                                  <Info className="w-4 h-4 text-muted-foreground hover:text-primary" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="left" className="max-w-xs">
-                                <p className="font-semibold text-xs mb-1">Fórmula:</p>
-                                <p className="text-xs font-mono">{calc.formula}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Legenda de Fórmulas */}
-                <div className="mt-4 p-3 rounded-lg bg-muted/50 border border-border">
-                  <p className="text-xs font-semibold text-foreground mb-2">📐 Fórmulas de Cálculo:</p>
-                  <div className="space-y-1 text-xs text-muted-foreground font-mono">
-                    {taxCalculations.slice(0, 5).map((calc) => (
-                      <div key={calc.taxId} className="flex gap-2">
-                        <span className="font-semibold text-primary min-w-[60px]">{calc.abbreviation}:</span>
-                        <span className="break-all">{calc.formula}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <p className="mt-3 text-xs text-muted-foreground italic">
-                  * Valores estimados para efeitos de planeamento. Consulte um contabilista para cálculos exactos.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Impostos Aplicáveis */}
         <div className="card-elevated overflow-hidden">
           <button
@@ -454,6 +351,152 @@ const SimulationResults = ({
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Cálculo Estimado de Impostos */}
+        {taxCalculations.length > 0 && (
+          <div className="card-elevated overflow-hidden border-2 border-accent/30">
+            <button
+              onClick={() => toggleSection('calculations')}
+              className="w-full p-4 flex items-center justify-between bg-accent/10 hover:bg-accent/20 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Calculator className="w-5 h-5 text-accent" />
+                <span className="font-semibold text-foreground">
+                  Cálculo Estimado de Impostos
+                </span>
+              </div>
+              {expandedSections.calculations ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+            
+            {expandedSections.calculations && (
+              <div className="p-4">
+                {/* Pressupostos */}
+                <div className="mb-4 p-3 rounded-lg bg-blue-50/80 border border-blue-200">
+                  <p className="text-xs font-semibold text-blue-800 mb-2">📋 Pressupostos do Cálculo:</p>
+                  <ul className="space-y-1 text-xs text-blue-700">
+                    {taxCalculations.find(c => c.taxId === 'imposto_industrial') && (
+                      <li className="flex items-start gap-1">
+                        <span className="font-bold mt-0.5">•</span>
+                        <span>
+                          <strong>Imposto Industrial:</strong>{' '}
+                          {industrialTaxRegime.grupo === 'C' 
+                            ? 'Grupo C — taxa de 6,5% incide directamente sobre o volume de negócios (tributação simplificada, sem necessidade de contabilidade organizada).'
+                            : `${industrialTaxRegime.grupo} — taxa de ${(industrialTaxRegime.taxa * 100).toFixed(0)}% incide sobre a matéria colectável (lucro tributável). O lucro tributável é estimado como a diferença entre proveitos e custos dedutíveis. Para maior precisão, indique os custos operacionais no formulário.`
+                          }
+                        </span>
+                      </li>
+                    )}
+                    {taxCalculations.find(c => c.taxId === 'imposto_selo') && (
+                      <li className="flex items-start gap-1">
+                        <span className="font-bold mt-0.5">•</span>
+                        <span>
+                          <strong>Imposto de Selo:</strong> Incide sobre actos, contratos, documentos e operações previstas na Tabela Geral do IS. 
+                          A taxa varia conforme o tipo de operação (recibos de quitação: 1%; contratos: 0,3-0,5%; operações financeiras: taxas específicas). 
+                          O valor apresentado é uma estimativa baseada na taxa de 1% sobre recibos de quitação emitidos.
+                        </span>
+                      </li>
+                    )}
+                    {taxCalculations.find(c => c.taxId === 'iva') && (
+                      <li className="flex items-start gap-1">
+                        <span className="font-bold mt-0.5">•</span>
+                        <span>
+                          <strong>IVA:</strong>{' '}
+                          {ivaRegime.id === 'iva_geral' 
+                            ? 'Regime Geral — IVA a entregar = IVA liquidado nas vendas - IVA dedutível nas compras. Estimativa baseada numa margem de valor acrescentado de 30%.'
+                            : ivaRegime.id === 'iva_simplificado'
+                            ? 'Regime Simplificado — 7% sobre o total dos recebimentos, sem direito a dedução do IVA suportado.'
+                            : 'Regime de Exclusão — isento de IVA (volume de negócios até 25 milhões Kz).'
+                          }
+                        </span>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Total Estimado */}
+                <div className="mb-4 p-4 rounded-lg bg-gradient-to-r from-accent/20 to-accent/5 border border-accent/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-accent" />
+                      <span className="font-medium text-foreground">Total Anual Estimado</span>
+                    </div>
+                    <span className="text-2xl font-bold text-accent">
+                      {formatCurrency(totalAnnualTaxEstimate)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tabela de Cálculos */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 px-2 font-medium text-muted-foreground">Imposto</th>
+                        <th className="text-right py-2 px-2 font-medium text-muted-foreground">Base</th>
+                        <th className="text-right py-2 px-2 font-medium text-muted-foreground">Taxa</th>
+                        <th className="text-right py-2 px-2 font-medium text-muted-foreground">Valor Est.</th>
+                        <th className="text-center py-2 px-2 font-medium text-muted-foreground w-10">
+                          <Info className="w-4 h-4 mx-auto" />
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {taxCalculations.map((calc) => (
+                        <tr key={calc.taxId} className="border-b border-border/50 hover:bg-muted/50">
+                          <td className="py-3 px-2">
+                            <div>
+                              <span className="font-medium text-foreground">{calc.abbreviation}</span>
+                              <p className="text-xs text-muted-foreground">{calc.notes}</p>
+                            </div>
+                          </td>
+                          <td className="text-right py-3 px-2 text-muted-foreground">
+                            {calc.baseValue > 0 ? formatCurrency(calc.baseValue) : '-'}
+                          </td>
+                          <td className="text-right py-3 px-2 text-muted-foreground">
+                            {calc.rate > 0 ? `${(calc.rate * 100).toFixed(1)}%` : '-'}
+                          </td>
+                          <td className="text-right py-3 px-2 font-semibold text-primary">
+                            {formatCurrency(calc.estimatedAmount)}
+                          </td>
+                          <td className="text-center py-3 px-2">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button className="p-1 rounded hover:bg-muted">
+                                  <Info className="w-4 h-4 text-muted-foreground hover:text-primary" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="left" className="max-w-xs">
+                                <p className="font-semibold text-xs mb-1">Fórmula:</p>
+                                <p className="text-xs font-mono">{calc.formula}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Legenda de Fórmulas */}
+                <div className="mt-4 p-3 rounded-lg bg-muted/50 border border-border">
+                  <p className="text-xs font-semibold text-foreground mb-2">📐 Fórmulas de Cálculo:</p>
+                  <div className="space-y-1 text-xs text-muted-foreground font-mono">
+                    {taxCalculations.slice(0, 5).map((calc) => (
+                      <div key={calc.taxId} className="flex gap-2">
+                        <span className="font-semibold text-primary min-w-[60px]">{calc.abbreviation}:</span>
+                        <span className="break-all">{calc.formula}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <p className="mt-3 text-xs text-muted-foreground italic">
+                  * Valores estimados para efeitos de planeamento. Consulte um contabilista para cálculos exactos.
+                </p>
               </div>
             )}
           </div>
