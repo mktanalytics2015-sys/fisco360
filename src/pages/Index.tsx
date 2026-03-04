@@ -1,23 +1,40 @@
 import { useState } from 'react';
-import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings } from 'lucide-react';
 import SimulatorForm from '@/components/SimulatorForm';
 import SimulationResults from '@/components/SimulationResults';
 import FeedbackWidget from '@/components/FeedbackWidget';
+import PremiumBanner from '@/components/PremiumBanner';
 import { calculateFiscalFramework, SimulationResult } from '@/utils/fiscalCalculator';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import sendizaLogo from '@/assets/Logo_Sendiza.png';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SimulationResult | null>(null);
+  const { user, isPremium, isAdmin, canSimulate, incrementSimulation, signOut, loading, profile } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSimulate = async (formData: any) => {
+    if (!canSimulate) {
+      toast({
+        title: 'Limite atingido',
+        description: 'Atingiu o limite de 3 simulações gratuitas este mês. Actualize para Premium para simulações ilimitadas.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
-    
-    // Simular processamento
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
     const simulationResults = calculateFiscalFramework(formData);
     setResults(simulationResults);
     setIsLoading(false);
+
+    if (user) await incrementSimulation();
   };
 
   const handleReset = () => {
@@ -25,33 +42,56 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Section */}
       <header className="hero-gradient text-primary-foreground">
-        <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2">
+              <Scale className="w-5 h-5" />
+              <span className="font-display font-bold text-lg">Fisco 360</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/admin')} className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10">
+                      <Settings className="w-4 h-4 mr-1" /> Admin
+                    </Button>
+                  )}
+                  {!isPremium && (
+                    <Button size="sm" className="btn-gold text-xs py-1 px-3" onClick={() => toast({ title: 'Em breve', description: 'O sistema de pagamentos será activado em breve.' })}>
+                      <Crown className="w-3 h-3 mr-1" /> Premium
+                    </Button>
+                  )}
+                  {isPremium && (
+                    <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full font-medium">⭐ Premium</span>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={signOut} className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10">
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10">
+                  <LogIn className="w-4 h-4 mr-1" /> Entrar
+                </Button>
+              )}
+            </div>
+          </div>
+          <div className="max-w-4xl mx-auto text-center pb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-6">
               <Scale className="w-4 h-4" />
               <span className="text-sm font-medium">Sistema Fiscal Angolano</span>
             </div>
-            
             <h1 className="text-3xl md:text-5xl font-display font-bold mb-4 leading-tight">
-              Simulador de{' '}
-              <span className="text-gradient-gold">Enquadramento Fiscal</span>
+              Simulador de <span className="text-gradient-gold">Enquadramento Fiscal</span>
             </h1>
-            
             <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto">
-              Descubra o regime fiscal correcto para a sua empresa e conheça todas as 
-              obrigações tributárias segundo o Código Geral Tributário de Angola.
+              Descubra o regime fiscal correcto para a sua empresa e conheça todas as obrigações tributárias segundo o Código Geral Tributário de Angola.
             </p>
           </div>
         </div>
-        
-        {/* Wave decoration */}
-        <div className="h-16 bg-background" style={{
-          clipPath: 'ellipse(70% 100% at 50% 100%)',
-          marginTop: '-1px'
-        }} />
+        <div className="h-16 bg-background" style={{ clipPath: 'ellipse(70% 100% at 50% 100%)', marginTop: '-1px' }} />
       </header>
 
       {/* Features Strip */}
@@ -68,9 +108,7 @@ const Index = () => {
                 <div className="p-2 rounded-lg bg-primary/10">
                   <feature.icon className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-foreground hidden sm:inline">
-                  {feature.label}
-                </span>
+                <span className="text-sm font-medium text-foreground hidden sm:inline">{feature.label}</span>
               </div>
             ))}
           </div>
@@ -78,39 +116,34 @@ const Index = () => {
       </section>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-12 flex-1">
         <div className="max-w-6xl mx-auto">
+          {/* Premium Banner for free users */}
+          {user && !isPremium && <PremiumBanner />}
+
+          {/* Free user simulation count */}
+          {user && !isPremium && profile && (
+            <div className="mb-4 text-sm text-muted-foreground text-center">
+              Simulações utilizadas: <span className="font-bold text-foreground">{profile.simulations_this_month}/3</span> este mês
+            </div>
+          )}
+
           {!results ? (
             <div className="grid lg:grid-cols-5 gap-8 lg:gap-12">
-              {/* Form Section */}
               <div className="lg:col-span-3">
                 <div className="card-elevated p-6 md:p-8">
                   <div className="mb-6">
-                    <h2 className="text-2xl font-display font-bold text-foreground mb-2">
-                      Dados da Empresa
-                    </h2>
-                    <p className="text-muted-foreground">
-                      Preencha os dados abaixo para obter o diagnóstico fiscal completo
-                    </p>
+                    <h2 className="text-2xl font-display font-bold text-foreground mb-2">Dados da Empresa</h2>
+                    <p className="text-muted-foreground">Preencha os dados abaixo para obter o diagnóstico fiscal completo</p>
                   </div>
-                  
                   <SimulatorForm onSimulate={handleSimulate} isLoading={isLoading} />
                 </div>
               </div>
-
-              {/* Info Sidebar */}
               <aside className="lg:col-span-2 space-y-6">
                 <div className="card-elevated p-6">
-                  <h3 className="font-display font-bold text-lg text-foreground mb-4">
-                    O que vou descobrir?
-                  </h3>
+                  <h3 className="font-display font-bold text-lg text-foreground mb-4">O que vou descobrir?</h3>
                   <ul className="space-y-3">
-                    {[
-                      'O regime fiscal mais adequado à sua empresa',
-                      'Todos os impostos aplicáveis ao seu sector',
-                      'Obrigações fiscais mensais, trimestrais e anuais',
-                      'Prazos de entrega e pagamento'
-                    ].map((item, index) => (
+                    {['O regime fiscal mais adequado à sua empresa', 'Todos os impostos aplicáveis ao seu sector', 'Obrigações fiscais mensais, trimestrais e anuais', 'Prazos de entrega e pagamento'].map((item, index) => (
                       <li key={index} className="flex items-start gap-3">
                         <ArrowRight className="w-4 h-4 text-accent mt-1 flex-shrink-0" />
                         <span className="text-sm text-muted-foreground">{item}</span>
@@ -118,52 +151,39 @@ const Index = () => {
                     ))}
                   </ul>
                 </div>
-
                 <div className="card-elevated p-6 border-l-4 border-l-accent">
-                  <h3 className="font-display font-bold text-lg text-foreground mb-2">
-                    Porquê usar este simulador?
-                  </h3>
+                  <h3 className="font-display font-bold text-lg text-foreground mb-2">Porquê usar este simulador?</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Empresas mal enquadradas no regime fiscal podem enfrentar multas, 
-                    penalizações e perda de benefícios fiscais. Este diagnóstico ajuda 
-                    a garantir a conformidade com a legislação angolana.
+                    Empresas mal enquadradas no regime fiscal podem enfrentar multas, penalizações e perda de benefícios fiscais.
                   </p>
                   <div className="flex items-center gap-2 text-sm font-medium text-accent">
                     <Shield className="w-4 h-4" />
                     <span>Evite problemas com a AGT</span>
                   </div>
                 </div>
-
-                <div className="p-4 rounded-lg bg-muted">
-                  <p className="text-xs text-muted-foreground text-center">
-                    Baseado no Código Geral Tributário de Angola e legislação fiscal vigente
-                  </p>
-                </div>
+                {!user && (
+                  <div className="card-elevated p-6 text-center">
+                    <Crown className="w-8 h-8 text-accent mx-auto mb-2" />
+                    <h3 className="font-display font-bold text-foreground mb-1">Crie a sua conta</h3>
+                    <p className="text-xs text-muted-foreground mb-3">3 simulações gratuitas por mês. Actualize para Premium por apenas 3.999 Kz/trimestre.</p>
+                    <Button onClick={() => navigate('/auth')} className="w-full" size="sm">Criar conta gratuita</Button>
+                  </div>
+                )}
               </aside>
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Results Header */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-display font-bold text-foreground">
-                    Resultado do Diagnóstico
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Análise completa do enquadramento fiscal da sua empresa
-                  </p>
+                  <h2 className="text-2xl font-display font-bold text-foreground">Resultado do Diagnóstico</h2>
+                  <p className="text-muted-foreground">Análise completa do enquadramento fiscal da sua empresa</p>
                 </div>
-                <button
-                  onClick={handleReset}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors"
-                >
+                <button onClick={handleReset} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors">
                   <RefreshCw className="w-4 h-4" />
                   <span className="hidden sm:inline">Nova Simulação</span>
                 </button>
               </div>
-
-              {/* Results Content */}
-              <SimulationResults 
+              <SimulationResults
                 regime={results.regime}
                 industrialTaxRegime={results.industrialTaxRegime}
                 ivaRegime={results.ivaRegime}
@@ -185,18 +205,19 @@ const Index = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Scale className="w-5 h-5 text-primary" />
-              <span className="font-display font-bold text-foreground">
-                Simulador Fiscal Angola
-              </span>
+              <span className="font-display font-bold text-foreground">Fisco 360</span>
             </div>
-            <p className="text-sm text-muted-foreground text-center md:text-right">
+            <p className="text-sm text-muted-foreground text-center">
               Ferramenta de diagnóstico fiscal. Consulte sempre um profissional certificado.
             </p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Criado e mantido pela</span>
+              <img src={sendizaLogo} alt="Sendiza" className="h-6" />
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* Feedback Widget */}
       <FeedbackWidget />
     </div>
   );
