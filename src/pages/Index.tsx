@@ -22,8 +22,18 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const getGuestSimCount = () => parseInt(localStorage.getItem('guest_sim_count') || '0', 10);
+
   const handleSimulate = async (formData: any) => {
-    if (!canSimulate) {
+    // Guest user: track locally, after 3 show signup popup
+    if (!user) {
+      const count = getGuestSimCount();
+      if (count >= 3) {
+        setShowSignupDialog(true);
+        return;
+      }
+      localStorage.setItem('guest_sim_count', String(count + 1));
+    } else if (!canSimulate) {
       toast({
         title: 'Limite atingido',
         description: 'Atingiu o limite de 3 simulações gratuitas este mês. Actualize para Premium para simulações ilimitadas.',
@@ -39,6 +49,14 @@ const Index = () => {
     setIsLoading(false);
 
     if (user) await incrementSimulation();
+  };
+
+  const handleUpgradePremium = () => {
+    window.open(PAYMENT_URL, '_blank');
+    toast({
+      title: '🎉 Parabéns!',
+      description: 'Após concluir o pagamento, o seu plano será actualizado para Premium automaticamente.',
+    });
   };
 
   const handleReset = () => {
