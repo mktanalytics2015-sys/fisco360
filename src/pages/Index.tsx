@@ -82,7 +82,7 @@ const Index = () => {
                     </Button>
                 }
                   {!isPremium &&
-                <Button size="sm" className="btn-gold text-xs py-1 px-3" onClick={() => toast({ title: 'Em breve', description: 'O sistema de pagamentos será activado em breve.' })}>
+                <Button size="sm" className="btn-gold text-xs py-1 px-3" onClick={handleUpgradePremium}>
                       <Crown className="w-3 h-3 mr-1" /> Premium
                     </Button>
                 }
