@@ -33,10 +33,11 @@ const Index = () => {
         return;
       }
       localStorage.setItem('guest_sim_count', String(count + 1));
-    } else if (!canSimulate) {
+    } else if (!isPremium) {
+      // Logged-in but not premium: must upgrade first
       toast({
-        title: 'Limite atingido',
-        description: 'Atingiu o limite de 3 simulações gratuitas este mês. Actualize para Premium para simulações ilimitadas.',
+        title: 'Plano Premium necessário',
+        description: 'Para utilizar o simulador, actualize para o Plano Premium por apenas 3.999 Kz/trimestre.',
         variant: 'destructive'
       });
       return;
