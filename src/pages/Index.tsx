@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings } from 'lucide-react';
 import SimulatorForm from '@/components/SimulatorForm';
@@ -9,11 +9,15 @@ import { calculateFiscalFramework, SimulationResult } from '@/utils/fiscalCalcul
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import sendizaLogo from '@/assets/Logo_Sendiza.png';
+
+const PAYMENT_URL = 'https://pay.kambafy.com/checkout/0404bffa-de5f-47df-bca3-da0caa7dfe71';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SimulationResult | null>(null);
+  const [showSignupDialog, setShowSignupDialog] = useState(false);
   const { user, isPremium, isAdmin, canSimulate, incrementSimulation, signOut, loading, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
