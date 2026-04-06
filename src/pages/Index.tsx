@@ -141,15 +141,19 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12 flex-1">
         <div className="max-w-6xl mx-auto">
-          {/* Premium Banner for free users */}
-          {user && !isPremium && <PremiumBanner />}
-
-          {/* Free user simulation count */}
-          {user && !isPremium && profile &&
-          <div className="mb-4 text-sm text-muted-foreground text-center">
-              Simulações utilizadas: <span className="font-bold text-foreground">{profile.simulations_this_month}/3</span> este mês
+          {/* Premium required banner for logged-in free users */}
+          {user && !isPremium && (
+            <div className="mb-6 p-4 rounded-lg border border-accent/30 bg-accent/5 text-center">
+              <Crown className="w-6 h-6 text-accent mx-auto mb-2" />
+              <h3 className="font-display font-bold text-foreground mb-1">Actualize para Premium para simular</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Para utilizar o simulador fiscal, é necessário ter o Plano Premium activo — apenas 3.999 Kz/trimestre.
+              </p>
+              <Button className="btn-gold" onClick={handleUpgradePremium}>
+                <Crown className="w-4 h-4 mr-1" /> Actualizar agora
+              </Button>
             </div>
-          }
+          )}
 
           {!results ?
           <div className="grid lg:grid-cols-5 gap-8 lg:gap-12">
