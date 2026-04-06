@@ -221,7 +221,29 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Signup Dialog for guest users */}
+      <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="w-5 h-5 text-accent" />
+              Limite de simulações atingido
+            </DialogTitle>
+            <DialogDescription>
+              Já utilizou as suas 3 simulações gratuitas. Crie uma conta gratuita para continuar a usar o simulador ou actualize para Premium por apenas 3.999 Kz/trimestre para acesso ilimitado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-4">
+            <Button onClick={() => { setShowSignupDialog(false); navigate('/auth'); }} className="w-full">
+              Criar conta gratuita
+            </Button>
+            <Button variant="outline" onClick={() => setShowSignupDialog(false)} className="w-full">
+              Fechar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <footer className="border-t border-border py-8 mt-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
