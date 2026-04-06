@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings } from 'lucide-react';
 import SimulatorForm from '@/components/SimulatorForm';
@@ -9,17 +9,31 @@ import { calculateFiscalFramework, SimulationResult } from '@/utils/fiscalCalcul
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import sendizaLogo from '@/assets/Logo_Sendiza.png';
+
+const PAYMENT_URL = 'https://pay.kambafy.com/checkout/0404bffa-de5f-47df-bca3-da0caa7dfe71';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SimulationResult | null>(null);
+  const [showSignupDialog, setShowSignupDialog] = useState(false);
   const { user, isPremium, isAdmin, canSimulate, incrementSimulation, signOut, loading, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const getGuestSimCount = () => parseInt(localStorage.getItem('guest_sim_count') || '0', 10);
+
   const handleSimulate = async (formData: any) => {
-    if (!canSimulate) {
+    // Guest user: track locally, after 3 show signup popup
+    if (!user) {
+      const count = getGuestSimCount();
+      if (count >= 3) {
+        setShowSignupDialog(true);
+        return;
+      }
+      localStorage.setItem('guest_sim_count', String(count + 1));
+    } else if (!canSimulate) {
       toast({
         title: 'Limite atingido',
         description: 'Atingiu o limite de 3 simulações gratuitas este mês. Actualize para Premium para simulações ilimitadas.',
@@ -35,6 +49,14 @@ const Index = () => {
     setIsLoading(false);
 
     if (user) await incrementSimulation();
+  };
+
+  const handleUpgradePremium = () => {
+    window.open(PAYMENT_URL, '_blank');
+    toast({
+      title: '🎉 Parabéns!',
+      description: 'Após concluir o pagamento, o seu plano será actualizado para Premium automaticamente.',
+    });
   };
 
   const handleReset = () => {
@@ -60,7 +82,7 @@ const Index = () => {
                     </Button>
                 }
                   {!isPremium &&
-                <Button size="sm" className="btn-gold text-xs py-1 px-3" onClick={() => toast({ title: 'Em breve', description: 'O sistema de pagamentos será activado em breve.' })}>
+                <Button size="sm" className="btn-gold text-xs py-1 px-3" onClick={handleUpgradePremium}>
                       <Crown className="w-3 h-3 mr-1" /> Premium
                     </Button>
                 }
@@ -199,7 +221,29 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Signup Dialog for guest users */}
+      <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="w-5 h-5 text-accent" />
+              Limite de simulações atingido
+            </DialogTitle>
+            <DialogDescription>
+              Já utilizou as suas 3 simulações gratuitas. Crie uma conta gratuita para continuar a usar o simulador ou actualize para Premium por apenas 3.999 Kz/trimestre para acesso ilimitado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-4">
+            <Button onClick={() => { setShowSignupDialog(false); navigate('/auth'); }} className="w-full">
+              Criar conta gratuita
+            </Button>
+            <Button variant="outline" onClick={() => setShowSignupDialog(false)} className="w-full">
+              Fechar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <footer className="border-t border-border py-8 mt-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">

@@ -1,13 +1,25 @@
 import { Crown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+
+const PAYMENT_URL = 'https://pay.kambafy.com/checkout/0404bffa-de5f-47df-bca3-da0caa7dfe71';
 
 const PremiumBanner = () => {
   const { user, isPremium, profile } = useAuth();
+  const { toast } = useToast();
 
   if (!user || isPremium) return null;
 
   const remaining = 3 - (profile?.simulations_this_month ?? 0);
+
+  const handleUpgrade = () => {
+    window.open(PAYMENT_URL, '_blank');
+    toast({
+      title: '🎉 Parabéns!',
+      description: 'Após concluir o pagamento, o seu plano será actualizado para Premium automaticamente.',
+    });
+  };
 
   return (
     <div className="card-elevated p-6 border-l-4 border-l-accent mb-6">
@@ -31,7 +43,7 @@ const PremiumBanner = () => {
         <div className="text-center">
           <p className="text-2xl font-bold text-primary">3.999 Kz</p>
           <p className="text-xs text-muted-foreground mb-2">/trimestre</p>
-          <Button className="btn-gold text-sm py-2 px-6">Actualizar agora</Button>
+          <Button className="btn-gold text-sm py-2 px-6" onClick={handleUpgrade}>Actualizar agora</Button>
         </div>
       </div>
     </div>
