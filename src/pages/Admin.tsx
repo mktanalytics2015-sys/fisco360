@@ -243,15 +243,16 @@ const Admin = () => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Utilizador</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Email</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Plano</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Simulações</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Estado</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Registado em</th>
-                  <th className="text-right p-3 text-xs font-medium text-muted-foreground uppercase">Acções</th>
-                </tr>
+                 <tr className="border-b border-border bg-muted/50">
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Utilizador</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Email</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Role</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Plano</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Simulações</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Estado</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Registado em</th>
+                   <th className="text-right p-3 text-xs font-medium text-muted-foreground uppercase">Acções</th>
+                 </tr>
               </thead>
               <tbody>
                 {loadingUsers ? (
