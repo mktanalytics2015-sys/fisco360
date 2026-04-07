@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Scale, Users, BarChart3, ArrowLeft, Shield, Crown, Ban, CheckCircle, Search, RefreshCw } from 'lucide-react';
+import { Scale, Users, BarChart3, ArrowLeft, Shield, Crown, Ban, CheckCircle, Search, RefreshCw, Download, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserProfile {
@@ -99,7 +99,56 @@ const Admin = () => {
     }
   };
 
-  if (loading || !isAdmin) return null;
+  const toggleAdmin = async (userId: string) => {
+    // Check if user already has admin role
+    const { data: existingRole } = await supabase
+      .from('user_roles')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (existingRole) {
+      // Remove admin role
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('role', 'admin');
+      if (!error) {
+        toast({ title: 'Role de administrador removido' });
+      }
+    } else {
+      // Add admin role
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role: 'admin' });
+      if (!error) {
+        toast({ title: '🛡️ Role de administrador atribuído' });
+      }
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = ['Nome', 'Email', 'Plano', 'Simulações/Mês', 'Estado', 'Data de Registo'];
+    const rows = filteredUsers.map(u => [
+      u.full_name || 'Sem nome',
+      u.email || '',
+      u.subscription_status === 'premium' ? 'Premium' : 'Gratuito',
+      u.simulations_this_month.toString(),
+      u.is_active ? 'Activo' : 'Inactivo',
+      new Date(u.created_at).toLocaleDateString('pt-AO'),
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `utilizadores_fisco360_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: 'CSV exportado com sucesso!' });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -173,7 +222,12 @@ const Admin = () => {
         <div className="card-elevated overflow-hidden">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h2 className="font-display font-bold text-lg text-foreground">Gestão de Utilizadores</h2>
-            <span className="text-sm text-muted-foreground">{filteredUsers.length} resultado(s)</span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">{filteredUsers.length} resultado(s)</span>
+              <Button size="sm" variant="outline" onClick={exportCSV}>
+                <Download className="w-4 h-4 mr-1" /> Exportar CSV
+              </Button>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -232,7 +286,16 @@ const Admin = () => {
                           className={u.subscription_status !== 'premium' ? 'btn-gold' : ''}
                         >
                           <Crown className="w-4 h-4 mr-1" />
-                          {u.subscription_status === 'premium' ? 'Remover' : 'Dar Premium'}
+                          {u.subscription_status === 'premium' ? 'Remover' : 'Premium'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toggleAdmin(u.user_id)}
+                          title="Atribuir/Remover Admin"
+                        >
+                          <ShieldCheck className="w-4 h-4 mr-1" />
+                          Admin
                         </Button>
                         <Button
                           size="sm"
