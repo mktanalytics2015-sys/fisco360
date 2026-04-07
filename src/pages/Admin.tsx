@@ -286,7 +286,16 @@ const Admin = () => {
                           className={u.subscription_status !== 'premium' ? 'btn-gold' : ''}
                         >
                           <Crown className="w-4 h-4 mr-1" />
-                          {u.subscription_status === 'premium' ? 'Remover' : 'Dar Premium'}
+                          {u.subscription_status === 'premium' ? 'Remover' : 'Premium'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toggleAdmin(u.user_id)}
+                          title="Atribuir/Remover Admin"
+                        >
+                          <ShieldCheck className="w-4 h-4 mr-1" />
+                          Admin
                         </Button>
                         <Button
                           size="sm"
