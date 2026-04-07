@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Scale, Users, BarChart3, ArrowLeft, Shield, Crown, Ban, CheckCircle, Search, RefreshCw } from 'lucide-react';
+import { Scale, Users, BarChart3, ArrowLeft, Shield, Crown, Ban, CheckCircle, Search, RefreshCw, Download, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserProfile {
