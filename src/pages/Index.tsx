@@ -192,7 +192,7 @@ const Index = () => {
               <div className="card-elevated p-6 text-center">
                     <Crown className="w-8 h-8 text-accent mx-auto mb-2" />
                     <h3 className="font-display font-bold text-foreground mb-1">Crie a sua conta</h3>
-                    <p className="text-xs text-muted-foreground mb-3">2 simulações gratuitas por mês. Actualize para Premium por apenas 3.999 Kz/trimestre e tenha acesso ilimitado.</p>
+                    <p className="text-xs text-muted-foreground mb-3">3 simulações gratuitas na plataforma. Actualize para Premium por apenas 3.999 Kz/trimestre e tenha acesso ilimitado.</p>
                     <Button onClick={() => navigate('/auth')} className="w-full" size="sm">Criar conta gratuita</Button>
                   </div>
               }
