@@ -30,6 +30,7 @@ const Admin = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'free' | 'premium'>('all');
   const [stats, setStats] = useState({ total: 0, premium: 0, active: 0, simulationsMonth: 0 });
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [adminUserIds, setAdminUserIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -62,6 +63,16 @@ const Admin = () => {
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: false });
+
+    // Fetch admin roles
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('user_id, role');
+    
+    const adminIds = new Set<string>(
+      (roles || []).filter(r => r.role === 'admin').map(r => r.user_id)
+    );
+    setAdminUserIds(adminIds);
 
     if (data) {
       setUsers(data as UserProfile[]);
@@ -117,6 +128,7 @@ const Admin = () => {
         .eq('role', 'admin');
       if (!error) {
         toast({ title: 'Role de administrador removido' });
+        fetchUsers();
       }
     } else {
       // Add admin role
@@ -125,6 +137,7 @@ const Admin = () => {
         .insert({ user_id: userId, role: 'admin' });
       if (!error) {
         toast({ title: '🛡️ Role de administrador atribuído' });
+        fetchUsers();
       }
     }
   };
@@ -232,83 +245,99 @@ const Admin = () => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Utilizador</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Email</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Plano</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Simulações</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Estado</th>
-                  <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Registado em</th>
-                  <th className="text-right p-3 text-xs font-medium text-muted-foreground uppercase">Acções</th>
-                </tr>
+                 <tr className="border-b border-border bg-muted/50">
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Utilizador</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Email</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Role</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Plano</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Simulações</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Estado</th>
+                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Registado em</th>
+                   <th className="text-right p-3 text-xs font-medium text-muted-foreground uppercase">Acções</th>
+                 </tr>
               </thead>
               <tbody>
                 {loadingUsers ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">A carregar...</td></tr>
-                ) : filteredUsers.length === 0 ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Nenhum utilizador encontrado</td></tr>
-                ) : filteredUsers.map(u => (
-                  <tr key={u.id} className="border-b border-border hover:bg-muted/30 transition-colors">
-                    <td className="p-3">
-                      <div className="flex items-center gap-3">
-                        {u.avatar_url ? (
-                          <img src={u.avatar_url} alt="" className="w-8 h-8 rounded-full" />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Users className="w-4 h-4 text-primary" />
-                          </div>
-                        )}
-                        <span className="text-sm font-medium text-foreground">{u.full_name || 'Sem nome'}</span>
-                      </div>
-                    </td>
-                    <td className="p-3 text-sm text-muted-foreground">{u.email || '—'}</td>
-                    <td className="p-3">
-                      <Badge variant={u.subscription_status === 'premium' ? 'default' : 'secondary'}>
-                        {u.subscription_status === 'premium' ? '⭐ Premium' : 'Gratuito'}
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-sm text-muted-foreground">{u.simulations_this_month}/mês</td>
-                    <td className="p-3">
-                      <Badge variant={u.is_active ? 'default' : 'destructive'}>
-                        {u.is_active ? 'Activo' : 'Inactivo'}
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-sm text-muted-foreground">
-                      {new Date(u.created_at).toLocaleDateString('pt-AO')}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          size="sm"
-                          variant={u.subscription_status === 'premium' ? 'outline' : 'default'}
-                          onClick={() => togglePremium(u.user_id, u.subscription_status)}
-                          title={u.subscription_status === 'premium' ? 'Remover Premium' : 'Dar Premium'}
-                          className={u.subscription_status !== 'premium' ? 'btn-gold' : ''}
-                        >
-                          <Crown className="w-4 h-4 mr-1" />
-                          {u.subscription_status === 'premium' ? 'Remover' : 'Premium'}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => toggleAdmin(u.user_id)}
-                          title="Atribuir/Remover Admin"
-                        >
-                          <ShieldCheck className="w-4 h-4 mr-1" />
-                          Admin
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant={u.is_active ? 'destructive' : 'default'}
-                          onClick={() => toggleActive(u.user_id, u.is_active)}
-                          title={u.is_active ? 'Desactivar' : 'Activar'}
-                        >
-                          {u.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                   <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">A carregar...</td></tr>
+                 ) : filteredUsers.length === 0 ? (
+                   <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">Nenhum utilizador encontrado</td></tr>
+                ) : filteredUsers.map(u => {
+                  const isUserAdmin = adminUserIds.has(u.user_id);
+                  return (
+                   <tr key={u.id} className={`border-b border-border hover:bg-muted/30 transition-colors ${isUserAdmin ? 'bg-primary/5' : ''}`}>
+                     <td className="p-3">
+                       <div className="flex items-center gap-3">
+                         {u.avatar_url ? (
+                           <img src={u.avatar_url} alt="" className="w-8 h-8 rounded-full" />
+                         ) : (
+                           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isUserAdmin ? 'bg-primary/20' : 'bg-primary/10'}`}>
+                             <Users className={`w-4 h-4 ${isUserAdmin ? 'text-primary' : 'text-primary/60'}`} />
+                           </div>
+                         )}
+                         <span className="text-sm font-medium text-foreground">{u.full_name || 'Sem nome'}</span>
+                       </div>
+                     </td>
+                     <td className="p-3 text-sm text-muted-foreground">{u.email || '—'}</td>
+                     <td className="p-3">
+                       {isUserAdmin ? (
+                         <Badge className="bg-primary text-primary-foreground">
+                           🛡️ Admin
+                         </Badge>
+                       ) : (
+                         <Badge variant="secondary" className="opacity-60">
+                           Utilizador
+                         </Badge>
+                       )}
+                     </td>
+                     <td className="p-3">
+                       <Badge variant={u.subscription_status === 'premium' ? 'default' : 'secondary'}>
+                         {u.subscription_status === 'premium' ? '⭐ Premium' : 'Gratuito'}
+                       </Badge>
+                     </td>
+                     <td className="p-3 text-sm text-muted-foreground">{u.simulations_this_month}/mês</td>
+                     <td className="p-3">
+                       <Badge variant={u.is_active ? 'default' : 'destructive'}>
+                         {u.is_active ? 'Activo' : 'Inactivo'}
+                       </Badge>
+                     </td>
+                     <td className="p-3 text-sm text-muted-foreground">
+                       {new Date(u.created_at).toLocaleDateString('pt-AO')}
+                     </td>
+                     <td className="p-3">
+                       <div className="flex gap-2 justify-end">
+                         <Button
+                           size="sm"
+                           variant={u.subscription_status === 'premium' ? 'outline' : 'default'}
+                           onClick={() => togglePremium(u.user_id, u.subscription_status)}
+                           title={u.subscription_status === 'premium' ? 'Remover Premium' : 'Dar Premium'}
+                           className={u.subscription_status !== 'premium' ? 'btn-gold' : ''}
+                         >
+                           <Crown className="w-4 h-4 mr-1" />
+                           {u.subscription_status === 'premium' ? 'Remover' : 'Premium'}
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant={isUserAdmin ? 'default' : 'outline'}
+                           onClick={() => toggleAdmin(u.user_id)}
+                           title={isUserAdmin ? 'Remover Admin' : 'Atribuir Admin'}
+                           className={isUserAdmin ? 'bg-primary hover:bg-primary/90' : 'opacity-60 hover:opacity-100'}
+                         >
+                           <ShieldCheck className="w-4 h-4 mr-1" />
+                           {isUserAdmin ? 'Remover Admin' : 'Dar Admin'}
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant={u.is_active ? 'destructive' : 'default'}
+                           onClick={() => toggleActive(u.user_id, u.is_active)}
+                           title={u.is_active ? 'Desactivar' : 'Activar'}
+                         >
+                           {u.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                         </Button>
+                       </div>
+                     </td>
+                   </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
