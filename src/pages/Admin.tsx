@@ -64,6 +64,16 @@ const Admin = () => {
       .select('*')
       .order('created_at', { ascending: false });
 
+    // Fetch admin roles
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('user_id, role');
+    
+    const adminIds = new Set<string>(
+      (roles || []).filter(r => r.role === 'admin').map(r => r.user_id)
+    );
+    setAdminUserIds(adminIds);
+
     if (data) {
       setUsers(data as UserProfile[]);
       setStats({
