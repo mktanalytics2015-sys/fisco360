@@ -22,6 +22,14 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Clear guest sim count when user is authenticated
+  useEffect(() => {
+    if (user) {
+      localStorage.removeItem('guest_sim_count');
+      setShowSignupDialog(false);
+    }
+  }, [user]);
+
   const getGuestSimCount = () => parseInt(localStorage.getItem('guest_sim_count') || '0', 10);
 
   const handleSimulate = async (formData: any) => {
