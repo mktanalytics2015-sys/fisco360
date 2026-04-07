@@ -128,6 +128,7 @@ const Admin = () => {
         .eq('role', 'admin');
       if (!error) {
         toast({ title: 'Role de administrador removido' });
+        fetchUsers();
       }
     } else {
       // Add admin role
@@ -136,6 +137,7 @@ const Admin = () => {
         .insert({ user_id: userId, role: 'admin' });
       if (!error) {
         toast({ title: '🛡️ Role de administrador atribuído' });
+        fetchUsers();
       }
     }
   };
