@@ -99,7 +99,56 @@ const Admin = () => {
     }
   };
 
-  if (loading || !isAdmin) return null;
+  const toggleAdmin = async (userId: string) => {
+    // Check if user already has admin role
+    const { data: existingRole } = await supabase
+      .from('user_roles')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (existingRole) {
+      // Remove admin role
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('role', 'admin');
+      if (!error) {
+        toast({ title: 'Role de administrador removido' });
+      }
+    } else {
+      // Add admin role
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role: 'admin' });
+      if (!error) {
+        toast({ title: '🛡️ Role de administrador atribuído' });
+      }
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = ['Nome', 'Email', 'Plano', 'Simulações/Mês', 'Estado', 'Data de Registo'];
+    const rows = filteredUsers.map(u => [
+      u.full_name || 'Sem nome',
+      u.email || '',
+      u.subscription_status === 'premium' ? 'Premium' : 'Gratuito',
+      u.simulations_this_month.toString(),
+      u.is_active ? 'Activo' : 'Inactivo',
+      new Date(u.created_at).toLocaleDateString('pt-AO'),
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `utilizadores_fisco360_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: 'CSV exportado com sucesso!' });
+  };
 
   return (
     <div className="min-h-screen bg-background">
