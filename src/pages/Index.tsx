@@ -22,11 +22,19 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Clear guest sim count when user is authenticated
+  useEffect(() => {
+    if (user) {
+      localStorage.removeItem('guest_sim_count');
+      setShowSignupDialog(false);
+    }
+  }, [user]);
+
   const getGuestSimCount = () => parseInt(localStorage.getItem('guest_sim_count') || '0', 10);
 
   const handleSimulate = async (formData: any) => {
     // Guest user: track locally, after 3 show signup popup
-    if (!user) {
+    if (!user && !loading) {
       const count = getGuestSimCount();
       if (count >= 3) {
         setShowSignupDialog(true);
@@ -188,7 +196,7 @@ const Index = () => {
                     <span>Evite problemas com a AGT</span>
                   </div>
                 </div>
-                {!user &&
+                {!user && !loading &&
               <div className="card-elevated p-6 text-center">
                     <Crown className="w-8 h-8 text-accent mx-auto mb-2" />
                     <h3 className="font-display font-bold text-foreground mb-1">Crie a sua conta</h3>
