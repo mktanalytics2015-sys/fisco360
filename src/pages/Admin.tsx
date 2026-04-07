@@ -30,6 +30,7 @@ const Admin = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'free' | 'premium'>('all');
   const [stats, setStats] = useState({ total: 0, premium: 0, active: 0, simulationsMonth: 0 });
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [adminUserIds, setAdminUserIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
