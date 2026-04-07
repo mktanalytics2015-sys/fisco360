@@ -222,7 +222,12 @@ const Admin = () => {
         <div className="card-elevated overflow-hidden">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h2 className="font-display font-bold text-lg text-foreground">Gestão de Utilizadores</h2>
-            <span className="text-sm text-muted-foreground">{filteredUsers.length} resultado(s)</span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">{filteredUsers.length} resultado(s)</span>
+              <Button size="sm" variant="outline" onClick={exportCSV}>
+                <Download className="w-4 h-4 mr-1" /> Exportar CSV
+              </Button>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
