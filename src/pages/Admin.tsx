@@ -256,9 +256,9 @@ const Admin = () => {
               </thead>
               <tbody>
                 {loadingUsers ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">A carregar...</td></tr>
-                ) : filteredUsers.length === 0 ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Nenhum utilizador encontrado</td></tr>
+                   <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">A carregar...</td></tr>
+                 ) : filteredUsers.length === 0 ? (
+                   <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">Nenhum utilizador encontrado</td></tr>
                 ) : filteredUsers.map(u => (
                   <tr key={u.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                     <td className="p-3">
