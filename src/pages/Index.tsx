@@ -45,7 +45,7 @@ const Index = () => {
       // Logged-in but not premium: must upgrade first
       toast({
         title: 'Plano Premium necessário',
-        description: 'Para utilizar o simulador, actualize para o Plano Premium por apenas 3.999 Kz/trimestre.',
+        description: 'Para utilizar o simulador, actualize para o Plano Premium por apenas 3.999 Kz/mensal.',
         variant: 'destructive'
       });
       return;
@@ -155,7 +155,7 @@ const Index = () => {
               <Crown className="w-6 h-6 text-accent mx-auto mb-2" />
               <h3 className="font-display font-bold text-foreground mb-1">Actualize para Premium para simular</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Para utilizar o simulador fiscal, é necessário ter o Plano Premium activo — apenas 3.999 Kz/trimestre.
+                Para utilizar o simulador fiscal, é necessário ter o Plano Premium activo — apenas 3.999 Kz/mensal.
               </p>
               <Button className="btn-gold" onClick={handleUpgradePremium}>
                 <Crown className="w-4 h-4 mr-1" /> Actualizar agora
@@ -200,7 +200,7 @@ const Index = () => {
               <div className="card-elevated p-6 text-center">
                     <Crown className="w-8 h-8 text-accent mx-auto mb-2" />
                     <h3 className="font-display font-bold text-foreground mb-1">Crie a sua conta</h3>
-                    <p className="text-xs text-muted-foreground mb-3">3 simulações gratuitas na plataforma. Actualize para Premium por apenas 3.999 Kz/trimestre e tenha acesso ilimitado.</p>
+                    <p className="text-xs text-muted-foreground mb-3">3 simulações gratuitas na plataforma. Actualize para Premium por apenas 3.999 Kz/mensal e tenha acesso ilimitado.</p>
                     <Button onClick={() => navigate('/auth')} className="w-full" size="sm">Criar conta gratuita</Button>
                   </div>
               }
@@ -243,7 +243,7 @@ const Index = () => {
               Limite de simulações atingido
             </DialogTitle>
             <DialogDescription>
-              Já utilizou as suas 3 simulações gratuitas. Crie uma conta gratuita para continuar a usar o simulador ou actualize para Premium por apenas 3.999 Kz/trimestre para acesso ilimitado.
+              Já utilizou as suas 3 simulações gratuitas. Crie uma conta gratuita para continuar a usar o simulador ou actualize para Premium por apenas 3.999 Kz/mensal para acesso ilimitado.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
