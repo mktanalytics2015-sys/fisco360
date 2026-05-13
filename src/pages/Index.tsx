@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings } from 'lucide-react';
+import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings, Users } from 'lucide-react';
 import SimulatorForm from '@/components/SimulatorForm';
 import SimulationResults from '@/components/SimulationResults';
 import FeedbackWidget from '@/components/FeedbackWidget';
@@ -83,6 +83,9 @@ const Index = () => {
               <span className="font-display font-bold text-lg">Fisco 360</span>
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/diretorio')} className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10">
+                <Users className="w-4 h-4 mr-1" /> Diretório
+              </Button>
               {user ?
               <>
                   {isAdmin &&
