@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounting_providers: {
+        Row: {
+          address: string | null
+          cedula_number: string | null
+          created_at: string
+          description: string | null
+          email: string
+          id: string
+          is_featured: boolean
+          is_premium: boolean
+          is_verified: boolean
+          languages: string[] | null
+          logo_url: string | null
+          name: string
+          nif: string | null
+          owner_id: string
+          phone: string | null
+          price_range_max: number | null
+          price_range_min: number | null
+          province: string | null
+          rating_avg: number
+          rating_count: number
+          services: Json | null
+          specialties: string[] | null
+          status: Database["public"]["Enums"]["provider_status"]
+          type: Database["public"]["Enums"]["provider_type"]
+          updated_at: string
+          website: string | null
+          whatsapp: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          address?: string | null
+          cedula_number?: string | null
+          created_at?: string
+          description?: string | null
+          email: string
+          id?: string
+          is_featured?: boolean
+          is_premium?: boolean
+          is_verified?: boolean
+          languages?: string[] | null
+          logo_url?: string | null
+          name: string
+          nif?: string | null
+          owner_id: string
+          phone?: string | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          province?: string | null
+          rating_avg?: number
+          rating_count?: number
+          services?: Json | null
+          specialties?: string[] | null
+          status?: Database["public"]["Enums"]["provider_status"]
+          type?: Database["public"]["Enums"]["provider_type"]
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          address?: string | null
+          cedula_number?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string
+          id?: string
+          is_featured?: boolean
+          is_premium?: boolean
+          is_verified?: boolean
+          languages?: string[] | null
+          logo_url?: string | null
+          name?: string
+          nif?: string | null
+          owner_id?: string
+          phone?: string | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          province?: string | null
+          rating_avg?: number
+          rating_count?: number
+          services?: Json | null
+          specialties?: string[] | null
+          status?: Database["public"]["Enums"]["provider_status"]
+          type?: Database["public"]["Enums"]["provider_type"]
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -56,6 +149,91 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          provider_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          provider_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          provider_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_reviews_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_requests: {
+        Row: {
+          budget_estimate: number | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          description: string
+          id: string
+          provider_id: string | null
+          requester_id: string | null
+          service_needed: string
+          status: Database["public"]["Enums"]["quote_status"]
+        }
+        Insert: {
+          budget_estimate?: number | null
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          provider_id?: string | null
+          requester_id?: string | null
+          service_needed: string
+          status?: Database["public"]["Enums"]["quote_status"]
+        }
+        Update: {
+          budget_estimate?: number | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          provider_id?: string | null
+          requester_id?: string | null
+          service_needed?: string
+          status?: Database["public"]["Enums"]["quote_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -89,6 +267,9 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      provider_status: "pending" | "approved" | "rejected"
+      provider_type: "company" | "individual"
+      quote_status: "pending" | "responded" | "closed"
       subscription_status: "free" | "premium" | "cancelled"
     }
     CompositeTypes: {
@@ -218,6 +399,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      provider_status: ["pending", "approved", "rejected"],
+      provider_type: ["company", "individual"],
+      quote_status: ["pending", "responded", "closed"],
       subscription_status: ["free", "premium", "cancelled"],
     },
   },
