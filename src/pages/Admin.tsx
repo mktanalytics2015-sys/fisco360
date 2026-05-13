@@ -175,9 +175,14 @@ const Admin = () => {
                 <p className="text-sm text-primary-foreground/70">Gestão da plataforma Fisco 360</p>
               </div>
             </div>
-            <button onClick={() => navigate('/')} className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground text-sm">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </button>
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="ghost" className="text-primary-foreground/80 hover:bg-white/10" onClick={() => navigate('/admin/diretorio')}>
+                <Shield className="w-4 h-4 mr-1" /> Diretório
+              </Button>
+              <button onClick={() => navigate('/')} className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground text-sm">
+                <ArrowLeft className="w-4 h-4" /> Voltar
+              </button>
+            </div>
           </div>
         </div>
       </header>
