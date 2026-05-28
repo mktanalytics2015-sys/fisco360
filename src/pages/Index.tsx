@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings, Users } from 'lucide-react';
+import { Scale, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings, Users, Shield, Wallet, ReceiptText, BookOpen, FileSignature, ExternalLink } from 'lucide-react';
 import SimulatorForm from '@/components/SimulatorForm';
 import SimulationResults from '@/components/SimulationResults';
 import FeedbackWidget from '@/components/FeedbackWidget';
