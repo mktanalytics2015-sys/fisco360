@@ -258,7 +258,7 @@ const Index = () => {
         </div>
       </main>
 
-      {!results && <FeaturedProviders limit={6} />}
+      {!results && <FeaturedProviders limit={5} featuredOnly variant="compact" title="Empresas em Destaque" subtitle="Profissionais certificados prontos para apoiar o seu negócio." />}
 
 
       {/* Signup Dialog for guest users */}
