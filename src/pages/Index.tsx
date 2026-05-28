@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Scale, FileCheck, Calculator, Shield, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings, Users } from 'lucide-react';
+import { Scale, ArrowRight, RefreshCw, LogIn, LogOut, Crown, Settings, Users, Shield, Wallet, ReceiptText, BookOpen, FileSignature, ExternalLink } from 'lucide-react';
 import SimulatorForm from '@/components/SimulatorForm';
 import SimulationResults from '@/components/SimulationResults';
 import FeedbackWidget from '@/components/FeedbackWidget';
@@ -129,26 +129,39 @@ const Index = () => {
         <div className="h-16 bg-background" style={{ clipPath: 'ellipse(70% 100% at 50% 100%)', marginTop: '-1px' }} />
       </header>
 
-      {/* Features Strip */}
-      <section className="py-8 border-b border-border">
+      {/* Recursos Oficiais Strip */}
+      <section className="py-6 border-b border-border bg-muted/20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-            { icon: Calculator, label: 'Cálculo Automático' },
-            { icon: FileCheck, label: 'Código Fiscal Actualizado' },
-            { icon: Shield, label: 'Análise Completa' },
-            { icon: Scale, label: 'Conformidade Legal' }].
-            map((feature, index) =>
-            <div key={index} className="flex items-center gap-3 justify-center md:justify-start">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <feature.icon className="w-5 h-5 text-primary" />
+              { icon: Wallet, label: 'Orçamento Cidadão', sub: 'Actualizado', href: 'https://cms.minfin.gov.ao/api/assets/portal-minfin/213cbb56-898c-4972-966f-924a8a0882a7/' },
+              { icon: ReceiptText, label: 'Facturas Electrónicas', sub: 'Manual do Utilizador', href: 'https://cms.minfin.gov.ao/api/assets/portal-minfin/8bda4582-2793-445f-b1db-2ad44a8f7371/' },
+              { icon: BookOpen, label: 'Código Geral Tributário', sub: 'Legislação fiscal', href: 'https://portaldocontribuinte.minfin.gov.ao/legislacao#' },
+              { icon: FileSignature, label: 'Contratação Pública', sub: 'Procedimentos', href: 'https://cms.minfin.gov.ao/api/assets/portal-minfin/0f19737e-5385-4d13-a140-fb4784df2d84/' },
+            ].map((item, index) => (
+              <a
+                key={index}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all"
+              >
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors flex-shrink-0">
+                  <item.icon className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-foreground hidden sm:inline">{feature.label}</span>
-              </div>
-            )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-foreground truncate">
+                    <span className="truncate">{item.label}</span>
+                    <ExternalLink className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground truncate">{item.sub}</p>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>
+
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12 flex-1">
@@ -245,7 +258,7 @@ const Index = () => {
         </div>
       </main>
 
-      {!results && <FeaturedProviders limit={6} />}
+      {!results && <FeaturedProviders limit={5} featuredOnly variant="compact" title="Empresas em Destaque" subtitle="Profissionais certificados prontos para apoiar o seu negócio." />}
 
 
       {/* Signup Dialog for guest users */}

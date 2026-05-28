@@ -44,14 +44,14 @@ const FeaturedProviders = ({
   const isCompact = variant === 'compact';
 
   return (
-    <section className={isCompact ? 'py-8' : 'py-12 bg-muted/30 border-y border-border'}>
+    <section className={isCompact ? 'py-6 border-t border-border bg-muted/20' : 'py-12 bg-muted/30 border-y border-border'}>
       <div className="container mx-auto px-4">
-        <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
+        <div className="flex items-end justify-between gap-4 mb-4 flex-wrap">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-semibold mb-2">
               <Users className="w-3 h-3" /> {featuredOnly ? 'Empresas em Destaque' : 'Profissionais Certificados'}
             </div>
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">{title}</h2>
+            <h2 className={`${isCompact ? 'text-xl' : 'text-2xl md:text-3xl'} font-display font-bold text-foreground`}>{title}</h2>
             {subtitle && <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{subtitle}</p>}
           </div>
           <Link
@@ -63,9 +63,15 @@ const FeaturedProviders = ({
         </div>
 
         {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
-              <div key={i} className="card-elevated p-5 h-44 animate-pulse bg-muted/40" />
+          <div className={isCompact ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3' : 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4'}>
+            {Array.from({ length: Math.min(limit, 5) }).map((_, i) => (
+              <div key={i} className={`card-elevated ${isCompact ? 'p-3 h-16' : 'p-5 h-44'} animate-pulse bg-muted/40`} />
+            ))}
+          </div>
+        ) : isCompact ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {providers.map((p) => (
+              <ProviderCard key={p.id} provider={p} compact />
             ))}
           </div>
         ) : (
@@ -79,5 +85,6 @@ const FeaturedProviders = ({
     </section>
   );
 };
+
 
 export default FeaturedProviders;
