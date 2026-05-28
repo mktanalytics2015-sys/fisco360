@@ -25,7 +25,7 @@ export const FeaturedProviders = ({
   useEffect(() => {
     (async () => {
       const { data } = await supabase
-        .from('accounting_providers')
+        .from('public_providers' as any)
         .select('*')
         .eq('status', 'approved')
         .order('is_featured', { ascending: false })
