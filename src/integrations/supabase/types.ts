@@ -182,6 +182,13 @@ export type Database = {
             referencedRelation: "accounting_providers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "provider_reviews_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "public_providers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       quote_requests: {
@@ -232,6 +239,13 @@ export type Database = {
             referencedRelation: "accounting_providers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "quote_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "public_providers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -254,7 +268,93 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_providers: {
+        Row: {
+          address: string | null
+          cedula_number: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          is_featured: boolean | null
+          is_premium: boolean | null
+          is_verified: boolean | null
+          languages: string[] | null
+          logo_url: string | null
+          name: string | null
+          owner_id: string | null
+          phone: string | null
+          price_range_max: number | null
+          price_range_min: number | null
+          province: string | null
+          rating_avg: number | null
+          rating_count: number | null
+          services: Json | null
+          specialties: string[] | null
+          status: Database["public"]["Enums"]["provider_status"] | null
+          type: Database["public"]["Enums"]["provider_type"] | null
+          updated_at: string | null
+          website: string | null
+          whatsapp: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          address?: string | null
+          cedula_number?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_premium?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
+          logo_url?: string | null
+          name?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          province?: string | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          services?: Json | null
+          specialties?: string[] | null
+          status?: Database["public"]["Enums"]["provider_status"] | null
+          type?: Database["public"]["Enums"]["provider_type"] | null
+          updated_at?: string | null
+          website?: string | null
+          whatsapp?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          address?: string | null
+          cedula_number?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_premium?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
+          logo_url?: string | null
+          name?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          province?: string | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          services?: Json | null
+          specialties?: string[] | null
+          status?: Database["public"]["Enums"]["provider_status"] | null
+          type?: Database["public"]["Enums"]["provider_type"] | null
+          updated_at?: string | null
+          website?: string | null
+          whatsapp?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
