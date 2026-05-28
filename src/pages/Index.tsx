@@ -233,10 +233,20 @@ const Index = () => {
               employeeCount={results.employeeCount}
               totalAnnualTaxEstimate={results.totalAnnualTaxEstimate} />
             
+            
+              <FeaturedProviders
+                title="Precisa de apoio? Contacte um Contabilista Certificado"
+                subtitle="5 empresas em destaque, prontas para o ajudar a cumprir as obrigações identificadas no seu diagnóstico."
+                limit={5}
+                compact
+              />
             </div>
           }
         </div>
       </main>
+
+      {!results && <FeaturedProviders />}
+
 
       {/* Signup Dialog for guest users */}
       <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
