@@ -32,7 +32,7 @@ export const FeaturedProviders = ({
         .order('is_premium', { ascending: false })
         .order('rating_avg', { ascending: false })
         .limit(limit);
-      setProviders((data as AccountingProvider[]) || []);
+      setProviders(((data as unknown) as AccountingProvider[]) || []);
       setLoading(false);
     })();
   }, [limit]);
