@@ -5,6 +5,7 @@ import SimulatorForm from '@/components/SimulatorForm';
 import SimulationResults from '@/components/SimulationResults';
 import FeedbackWidget from '@/components/FeedbackWidget';
 import PremiumBanner from '@/components/PremiumBanner';
+import FeaturedProviders from '@/components/FeaturedProviders';
 import { calculateFiscalFramework, SimulationResult } from '@/utils/fiscalCalculator';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
