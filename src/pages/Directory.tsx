@@ -21,8 +21,9 @@ const Directory = () => {
   useEffect(() => {
     (async () => {
       const { data } = await supabase
-        .from('public_providers' as any)
+        .from('accounting_providers')
         .select('*')
+        .eq('status', 'approved')
         .order('is_featured', { ascending: false })
         .order('rating_avg', { ascending: false });
       setProviders((data as any[] as AccountingProvider[]) || []);

@@ -29,7 +29,7 @@ const ProviderProfile = () => {
   const load = async () => {
     if (!id) return;
     const [{ data: p }, { data: r }] = await Promise.all([
-      supabase.from('public_providers' as any).select('*').eq('id', id).maybeSingle(),
+      supabase.from('accounting_providers').select('*').eq('id', id).maybeSingle(),
       supabase.from('provider_reviews').select('*').eq('provider_id', id).order('created_at', { ascending: false }),
     ]);
     setProvider((p as any) || null);
@@ -190,6 +190,7 @@ const ProviderProfile = () => {
         <aside className="space-y-4">
           <div className="card-elevated p-6 space-y-3">
             <h3 className="font-display font-bold">Contactos</h3>
+            <a href={`mailto:${provider.email}`} className="flex items-center gap-2 text-sm text-foreground hover:text-primary"><Mail className="w-4 h-4" /> {provider.email}</a>
             {provider.phone && <a href={`tel:${provider.phone}`} className="flex items-center gap-2 text-sm text-foreground hover:text-primary"><Phone className="w-4 h-4" /> {provider.phone}</a>}
             {provider.website && <a href={provider.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-foreground hover:text-primary"><Globe className="w-4 h-4" /> Website</a>}
             {provider.address && <p className="flex items-start gap-2 text-sm text-muted-foreground"><MapPin className="w-4 h-4 mt-0.5" /> {provider.address}</p>}
