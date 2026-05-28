@@ -5,6 +5,7 @@ import SimulatorForm from '@/components/SimulatorForm';
 import SimulationResults from '@/components/SimulationResults';
 import FeedbackWidget from '@/components/FeedbackWidget';
 import PremiumBanner from '@/components/PremiumBanner';
+import FeaturedProviders from '@/components/FeaturedProviders';
 import { calculateFiscalFramework, SimulationResult } from '@/utils/fiscalCalculator';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -232,10 +233,20 @@ const Index = () => {
               employeeCount={results.employeeCount}
               totalAnnualTaxEstimate={results.totalAnnualTaxEstimate} />
             
+              <FeaturedProviders
+                title="Precisa de um contabilista?"
+                subtitle="Empresas e profissionais em destaque, prontos para ajudar com a sua contabilidade e obrigações fiscais."
+                limit={5}
+                featuredOnly
+                variant="compact"
+              />
             </div>
           }
         </div>
       </main>
+
+      {!results && <FeaturedProviders limit={6} />}
+
 
       {/* Signup Dialog for guest users */}
       <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
