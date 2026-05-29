@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { ProviderCard } from '@/components/ProviderCard';
 import type { AccountingProvider } from '@/types/provider';
@@ -79,6 +80,16 @@ const FeaturedProviders = ({
             {providers.map((p) => (
               <ProviderCard key={p.id} provider={p} />
             ))}
+          </div>
+        )}
+
+        {!isCompact && (
+          <div className="flex justify-center mt-8">
+            <Button asChild size="lg" className="font-semibold">
+              <Link to="/diretorio" className="inline-flex items-center gap-2">
+                Explorar Diretório <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
           </div>
         )}
       </div>
