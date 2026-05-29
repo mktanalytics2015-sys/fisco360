@@ -82,6 +82,16 @@ const FeaturedProviders = ({
             ))}
           </div>
         )}
+
+        {!isCompact && (
+          <div className="flex justify-center mt-8">
+            <Button asChild size="lg" className="font-semibold">
+              <Link to="/diretorio" className="inline-flex items-center gap-2">
+                Explorar Diretório <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
